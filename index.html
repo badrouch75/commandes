@@ -106,6 +106,40 @@
   .hist { display:flex; align-items:center; gap:10px; }
   .hist div { flex:1; } .hist small { color:var(--gris); }
   .hist button { padding:10px 12px; border-radius:10px; border:1px solid var(--bord); background:var(--fond); font-size:14px; color:var(--texte); }
+  /* ----- Design v2 ----- */
+  :root { --fond:#f5efe6; --carte:#fffdf9; --texte:#2b211c; --gris:#8a7b70; --bord:#e8ddd0;
+          --accent:#c2410c; --accent-clair:#fdf0e6; --sombre:#2b211c; --vert:#3f7d2c; }
+  body { font-family:"Avenir Next",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+  header h1 { font-size:20px; font-weight:800; letter-spacing:.02em; }
+  .etats { align-items:center; } .qui { margin-left:auto; flex:none; color:#e8ddd0; font-size:13px; font-weight:600; padding-left:8px; }
+  .zones { display:flex; gap:6px; background:#eadfd1; padding:5px; border-radius:14px; margin-bottom:10px; }
+  .zones button { flex:1; border:0; background:none; padding:11px 6px; border-radius:10px; font-size:15px; font-weight:700; color:var(--gris); font-family:inherit; }
+  .zones button.actif { background:var(--z); color:#fff; box-shadow:0 2px 6px rgba(0,0,0,.18); }
+  .zones b { display:inline-block; margin-left:6px; min-width:20px; padding:1px 6px; border-radius:999px; background:var(--accent); color:#fff; font-size:12px; }
+  .zones button.actif b { background:#fff; color:var(--z); }
+  .legende { display:flex; gap:14px; font-size:12px; color:var(--gris); margin:0 2px 12px; }
+  .legende i { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:5px; vertical-align:-1px; }
+  .l-libre { background:var(--carte); border:1px solid var(--bord); } .l-occ { background:var(--accent); } .l-paye { background:var(--vert); }
+  .grille-tables { grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:12px; }
+  .grille-tables button { aspect-ratio:auto; min-height:104px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+    border:1.5px solid var(--bord); border-radius:18px; background:var(--carte); box-shadow:0 1px 3px rgba(43,33,28,.06); font-family:inherit; padding:8px 4px; }
+  .grille-tables .num { font-size:30px; font-weight:800; line-height:1; }
+  .grille-tables .cote { font-size:12px; font-weight:600; color:var(--gris); }
+  .grille-tables .st { font-size:12px; font-weight:600; color:var(--gris); margin-top:4px; }
+  .grille-tables button.occupee { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .grille-tables button.payee { background:var(--vert); border-color:var(--vert); color:#fff; }
+  .grille-tables button.occupee span, .grille-tables button.payee span { color:#fff; }
+  .grille-tables button:active { transform:scale(.96); background:var(--accent-clair); color:var(--texte); }
+  .article { border-radius:16px; box-shadow:0 1px 3px rgba(43,33,28,.06); min-height:68px; }
+  .ligne { border-radius:16px; }
+  .statut { border-radius:16px; padding:14px 16px; font-weight:800; font-size:18px; margin-bottom:12px; }
+  .statut small { display:block; font-weight:500; font-size:13px; opacity:.85; margin-top:2px; }
+  .statut.nonpaye { background:var(--accent-clair); color:var(--accent); border:1.5px solid var(--accent); }
+  .statut.paye { background:#eaf4e4; color:var(--vert); border:1.5px solid var(--vert); }
+  .envoi-tete { font-size:12px; font-weight:700; color:var(--gris); text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
+  .art { padding:5px 0; border-top:1px dashed var(--bord); } .art:first-of-type { border-top:0; }
+  .actions-table { display:flex; gap:10px; margin-top:6px; } .actions-table .gros { flex:1 !important; font-family:inherit; }
+  .vert { background:var(--vert); color:#fff; }
 </style>
 </head>
 <body>
@@ -123,11 +157,11 @@
 
 <main>
   <section class="ecran actif" id="ecranTables">
-    <label class="champ">Votre prénom
-      <input id="serveur" placeholder="ex : Karim" autocomplete="off">
-    </label>
-    <div class="titre">Choisir la table</div>
+    <input id="serveur" type="hidden">
+    <div class="zones" id="zones"></div>
+    <div class="legende"><span><i class="l-libre"></i>Libre</span><span><i class="l-occ"></i>En cours</span><span><i class="l-paye"></i>Payé</span></div>
     <div class="grille-tables" id="grilleTables"></div>
+    <div class="grille-tables" id="autresTables" style="margin-top:10px"></div>
     <label class="champ" style="margin-top:16px">Autre (terrasse, emporter…)
       <input id="tableLibre" placeholder="ex : T5, EMP" autocomplete="off">
     </label>
@@ -137,6 +171,8 @@
     <div class="onglets" id="onglets"></div>
     <div class="articles" id="articles"></div>
   </section>
+
+  <section class="ecran" id="ecranTable"><div id="detailTable"></div></section>
 
   <section class="ecran" id="ecranPanier">
     <div class="ligne haut" style="display:flex;align-items:center">
@@ -170,7 +206,7 @@ const stock = { lire: k => { try { return localStorage.getItem(k) || ""; } catch
 
 class CodeRequis extends Error {}
 /* ===== Version autonome : tout tourne sur l'appareil, impression directe Epson ePOS-Print ===== */
-const MENU = {"groupes": {"extras_sale": {"titre": "Extras", "type": "multiple", "valeurs": [{"nom": "Œuf poché", "prix": 2}, {"nom": "Œufs brouillés", "prix": 4}, {"nom": "Avocat", "prix": 3}, {"nom": "Halloumi", "prix": 3}, {"nom": "Saumon fumé", "prix": 4}, {"nom": "Bacon", "prix": 3}]}, "temperature": {"titre": "Chaud ou glacé", "type": "unique", "defaut": "Chaud", "valeurs": [{"nom": "Chaud"}, {"nom": "Glacé"}]}, "lait": {"titre": "Lait", "type": "unique", "defaut": "Lait de vache", "valeurs": [{"nom": "Lait de vache"}, {"nom": "Avoine"}, {"nom": "Coco"}, {"nom": "Amande"}]}}, "categories": [{"nom": "Plats salés", "imprimante": "cuisine", "groupes": ["extras_sale"], "articles": [{"nom": "Vert Crémeux", "prix": 15, "ingredients": ["Guacamole", "Œufs pochés", "Sésame noir", "Piment doux", "Petite salade"]}, {"nom": "Nordique Chill", "prix": 17, "ingredients": ["Saumon fumé", "Avocat", "Œufs pochés", "Crème à l'aneth", "Citron", "Petite salade"]}, {"nom": "Smoky Benny", "prix": 18, "ingredients": ["Saumon fumé", "Œufs pochés", "Câpres", "Sauce hollandaise", "Petite salade"]}, {"nom": "Benedict Waffle", "prix": 17, "ingredients": ["Œufs pochés", "Bacon", "Avocat", "Sauce hollandaise", "Petite salade"]}, {"nom": "Méditerranéen Sun", "prix": 15, "ingredients": ["Feta", "Avocat", "Tomates cerises", "Zaatar", "Petite salade"]}, {"nom": "Rouge Soleil", "prix": 17, "ingredients": ["Œufs pochés", "Poivrons confits", "Épices", "Petite salade"]}, {"nom": "Benny Original", "prix": 17, "ingredients": ["Bacon", "Œufs pochés", "Sauce hollandaise", "Petite salade"]}, {"nom": "Triomfé Signature", "prix": 18, "ingredients": ["Halloumi", "Bacon", "Œufs brouillés", "Avocat", "Tomates cerises", "Petite salade"]}]}, {"nom": "Plats sucrés", "imprimante": "cuisine", "articles": [{"nom": "Maple Mood", "prix": 13, "ingredients": ["Sirop d'érable", "Fruits frais"]}, {"nom": "Pinky Stack", "prix": 14, "ingredients": ["Fruits rouges", "Chantilly"]}, {"nom": "Banoffee Love", "prix": 14, "ingredients": ["Banane", "Caramel", "Éclats de pralin"]}, {"nom": "Sweet Brioche", "prix": 14, "ingredients": ["Banane", "Caramel beurre salé", "Noix"]}, {"nom": "Nutella Bliss", "prix": 14, "ingredients": ["Nutella", "Éclats de noisettes"]}, {"nom": "Spéculoos Crunch", "prix": 15, "ingredients": ["Chantilly", "Éclats croquants"]}, {"nom": "Gaufre Pistachio Bloom", "prix": 15, "ingredients": ["Crème pistache", "Éclats de pistaches"]}, {"nom": "Gaufre Nutella", "prix": 14, "ingredients": ["Nutella", "Kinder"]}]}, {"nom": "Salades & Bowls", "imprimante": "cuisine", "groupes": ["extras_sale"], "articles": [{"nom": "César Croquant", "prix": 14, "ingredients": ["Poulet", "Parmesan", "Œuf mollet", "Croûtons", "Sauce César"]}, {"nom": "Salade Gourmande", "prix": 12, "ingredients": ["Avocat", "Tomates cerises", "Comté", "Noix", "Vinaigrette"]}, {"nom": "Salade Nordique", "prix": 16, "ingredients": ["Saumon gravlax", "Avocat", "Radis", "Roquette", "Sésame", "Vinaigrette"]}, {"nom": "Poke Bowl", "prix": 17, "ingredients": ["Saumon gravlax", "Avocat", "Edamame", "Concombre", "Radis", "Sésame", "Sauce soja"]}, {"nom": "Buddha Bowl Veggie", "prix": 13, "ingredients": ["Pois chiches", "Avocat", "Crudités", "Sauce tahini"]}, {"nom": "Granola Bowl", "prix": 13, "groupes": [], "ingredients": ["Granola", "Yaourt", "Miel", "Fruits frais"]}, {"nom": "Chia Pudding", "prix": 13, "groupes": [], "ingredients": ["Granola", "Fruits rouges", "Miel"]}, {"nom": "Açaí Bowl", "prix": 12, "groupes": [], "ingredients": ["Granola", "Banane", "Fruits rouges", "Noix de coco"]}]}, {"nom": "Sandwichs & Bagels", "imprimante": "cuisine", "groupes": ["extras_sale"], "articles": [{"nom": "Parisien Fermier", "prix": 9, "ingredients": ["Beurre", "Cornichons"]}, {"nom": "Nordique", "prix": 11, "ingredients": ["Cream cheese", "Concombre", "Aneth"]}, {"nom": "Poulet César", "prix": 11, "ingredients": ["Salade romaine", "Parmesan", "Sauce César"]}, {"nom": "Méditerranéen", "prix": 10, "ingredients": ["Houmous", "Aubergines", "Feta", "Tomates confites"]}, {"nom": "Club Maison", "prix": 10, "ingredients": ["Œuf dur", "Tomate", "Concombre", "Olives", "Oignon rouge", "Sauce citronnée"]}, {"nom": "Pastrami Deli", "prix": 14, "ingredients": ["Cheddar", "Pickles", "Moutarde", "Salade"]}, {"nom": "Bagel New Yorker", "prix": 10, "ingredients": ["Cream cheese", "Concombre", "Oignons rouges"]}, {"nom": "Bagel Honey Chicken", "prix": 10, "ingredients": ["Cheddar", "Salade", "Sauce miel-moutarde"]}]}, {"nom": "Douceurs", "imprimante": "bar", "articles": [{"nom": "Croissant", "prix": 3.5}, {"nom": "Pain au chocolat", "prix": 3.5}, {"nom": "Cookie du moment", "prix": 4.5}, {"nom": "Cake marbré", "prix": 4.5}, {"nom": "Cheesecake", "prix": 5.5}, {"nom": "Banana bread", "prix": 5.5}, {"nom": "Carrot cake", "prix": 5.5}, {"nom": "Moelleux au chocolat", "prix": 5.5}, {"nom": "Brownie", "prix": 5.5}]}, {"nom": "Daily Shots", "imprimante": "bar", "groupes": ["temperature", "lait"], "articles": [{"nom": "Espresso", "prix": 2.8, "groupes": []}, {"nom": "Double espresso", "prix": 3.8, "groupes": []}, {"nom": "Americano", "prix": 3.5, "groupes": ["temperature"]}, {"nom": "Macchiato", "prix": 4}, {"nom": "Cappuccino", "prix": 5.5}, {"nom": "Latte", "prix": 5.5}, {"nom": "Flat White", "prix": 6}, {"nom": "Chocolat chaud", "prix": 5}, {"nom": "Matcha Latte", "prix": 6}, {"nom": "Chaï Latte", "prix": 6}, {"nom": "Thé / Infusion bio", "prix": 5, "groupes": ["temperature"]}, {"nom": "Soft drink", "prix": 3.5, "groupes": []}]}, {"nom": "Créations", "imprimante": "bar", "groupes": ["temperature", "lait"], "articles": [{"nom": "Ube Dream", "prix": 8}, {"nom": "Cookie Mocha", "prix": 8}, {"nom": "Pistachio Matcha", "prix": 8}, {"nom": "Lavender Vanilla", "prix": 8}, {"nom": "Pumpkin Spice Latte", "prix": 8}, {"nom": "Mango Matcha", "prix": 8}]}, {"nom": "Jus pressés", "imprimante": "bar", "articles": [{"nom": "Aube", "prix": 8}, {"nom": "Rubis", "prix": 8}, {"nom": "Verda", "prix": 8}, {"nom": "Matcha Glow", "prix": 8}, {"nom": "Tropical Vibes", "prix": 8}, {"nom": "Jus d'orange", "prix": 5}, {"nom": "Citronnade", "prix": 5}]}]};
+const MENU = {"groupes": {"extras_sale": {"titre": "Extras", "type": "multiple", "valeurs": [{"nom": "Œuf poché"}, {"nom": "Œufs brouillés"}, {"nom": "Avocat"}, {"nom": "Halloumi"}, {"nom": "Saumon fumé"}, {"nom": "Bacon"}]}, "temperature": {"titre": "Chaud ou glacé", "type": "unique", "defaut": "Chaud", "valeurs": [{"nom": "Chaud"}, {"nom": "Glacé"}]}, "lait": {"titre": "Lait", "type": "unique", "defaut": "Lait de vache", "valeurs": [{"nom": "Lait de vache"}, {"nom": "Avoine"}, {"nom": "Coco"}, {"nom": "Amande"}]}}, "categories": [{"nom": "Plats salés", "imprimante": "cuisine", "groupes": ["extras_sale"], "articles": [{"nom": "Vert Crémeux", "ingredients": ["Guacamole", "Œufs pochés", "Sésame noir", "Piment doux", "Petite salade"]}, {"nom": "Nordique Chill", "ingredients": ["Saumon fumé", "Avocat", "Œufs pochés", "Crème à l'aneth", "Citron", "Petite salade"]}, {"nom": "Smoky Benny", "ingredients": ["Saumon fumé", "Œufs pochés", "Câpres", "Sauce hollandaise", "Petite salade"]}, {"nom": "Benedict Waffle", "ingredients": ["Œufs pochés", "Bacon", "Avocat", "Sauce hollandaise", "Petite salade"]}, {"nom": "Méditerranéen Sun", "ingredients": ["Feta", "Avocat", "Tomates cerises", "Zaatar", "Petite salade"]}, {"nom": "Rouge Soleil", "ingredients": ["Œufs pochés", "Poivrons confits", "Épices", "Petite salade"]}, {"nom": "Benny Original", "ingredients": ["Bacon", "Œufs pochés", "Sauce hollandaise", "Petite salade"]}, {"nom": "Triomfé Signature", "ingredients": ["Halloumi", "Bacon", "Œufs brouillés", "Avocat", "Tomates cerises", "Petite salade"]}]}, {"nom": "Plats sucrés", "imprimante": "cuisine", "articles": [{"nom": "Maple Mood", "ingredients": ["Sirop d'érable", "Fruits frais"]}, {"nom": "Pinky Stack", "ingredients": ["Fruits rouges", "Chantilly"]}, {"nom": "Banoffee Love", "ingredients": ["Banane", "Caramel", "Éclats de pralin"]}, {"nom": "Sweet Brioche", "ingredients": ["Banane", "Caramel beurre salé", "Noix"]}, {"nom": "Nutella Bliss", "ingredients": ["Nutella", "Éclats de noisettes"]}, {"nom": "Spéculoos Crunch", "ingredients": ["Chantilly", "Éclats croquants"]}, {"nom": "Gaufre Pistachio Bloom", "ingredients": ["Crème pistache", "Éclats de pistaches"]}, {"nom": "Gaufre Nutella", "ingredients": ["Nutella", "Kinder"]}]}, {"nom": "Salades & Bowls", "imprimante": "cuisine", "groupes": ["extras_sale"], "articles": [{"nom": "César Croquant", "ingredients": ["Poulet", "Parmesan", "Œuf mollet", "Croûtons", "Sauce César"]}, {"nom": "Salade Gourmande", "ingredients": ["Avocat", "Tomates cerises", "Comté", "Noix", "Vinaigrette"]}, {"nom": "Salade Nordique", "ingredients": ["Saumon gravlax", "Avocat", "Radis", "Roquette", "Sésame", "Vinaigrette"]}, {"nom": "Poke Bowl", "ingredients": ["Saumon gravlax", "Avocat", "Edamame", "Concombre", "Radis", "Sésame", "Sauce soja"]}, {"nom": "Buddha Bowl Veggie", "ingredients": ["Pois chiches", "Avocat", "Crudités", "Sauce tahini"]}, {"nom": "Granola Bowl", "groupes": [], "ingredients": ["Granola", "Yaourt", "Miel", "Fruits frais"]}, {"nom": "Chia Pudding", "groupes": [], "ingredients": ["Granola", "Fruits rouges", "Miel"]}, {"nom": "Açaí Bowl", "groupes": [], "ingredients": ["Granola", "Banane", "Fruits rouges", "Noix de coco"]}]}, {"nom": "Sandwichs & Bagels", "imprimante": "cuisine", "groupes": ["extras_sale"], "articles": [{"nom": "Parisien Fermier", "ingredients": ["Beurre", "Cornichons"]}, {"nom": "Nordique", "ingredients": ["Cream cheese", "Concombre", "Aneth"]}, {"nom": "Poulet César", "ingredients": ["Salade romaine", "Parmesan", "Sauce César"]}, {"nom": "Méditerranéen", "ingredients": ["Houmous", "Aubergines", "Feta", "Tomates confites"]}, {"nom": "Club Maison", "ingredients": ["Œuf dur", "Tomate", "Concombre", "Olives", "Oignon rouge", "Sauce citronnée"]}, {"nom": "Pastrami Deli", "ingredients": ["Cheddar", "Pickles", "Moutarde", "Salade"]}, {"nom": "Bagel New Yorker", "ingredients": ["Cream cheese", "Concombre", "Oignons rouges"]}, {"nom": "Bagel Honey Chicken", "ingredients": ["Cheddar", "Salade", "Sauce miel-moutarde"]}]}, {"nom": "Douceurs", "imprimante": "bar", "articles": [{"nom": "Croissant"}, {"nom": "Pain au chocolat"}, {"nom": "Cookie du moment"}, {"nom": "Cake marbré"}, {"nom": "Cheesecake"}, {"nom": "Banana bread"}, {"nom": "Carrot cake"}, {"nom": "Moelleux au chocolat"}, {"nom": "Brownie"}]}, {"nom": "Daily Shots", "imprimante": "bar", "groupes": ["temperature", "lait"], "articles": [{"nom": "Espresso", "groupes": []}, {"nom": "Double espresso", "groupes": []}, {"nom": "Americano", "groupes": ["temperature"]}, {"nom": "Macchiato"}, {"nom": "Cappuccino"}, {"nom": "Latte"}, {"nom": "Flat White"}, {"nom": "Chocolat chaud"}, {"nom": "Matcha Latte"}, {"nom": "Chaï Latte"}, {"nom": "Thé / Infusion bio", "groupes": ["temperature"]}, {"nom": "Soft drink", "groupes": []}]}, {"nom": "Créations", "imprimante": "bar", "groupes": ["temperature", "lait"], "articles": [{"nom": "Ube Dream"}, {"nom": "Cookie Mocha"}, {"nom": "Pistachio Matcha"}, {"nom": "Lavender Vanilla"}, {"nom": "Pumpkin Spice Latte"}, {"nom": "Mango Matcha"}]}, {"nom": "Jus pressés", "imprimante": "bar", "articles": [{"nom": "Aube"}, {"nom": "Rubis"}, {"nom": "Verda"}, {"nom": "Matcha Glow"}, {"nom": "Tropical Vibes"}, {"nom": "Jus d'orange"}, {"nom": "Citronnade"}]}]};
 const RESTO = "Triomfé", NB_TABLES = 30;
 const NOMS_IMP = { cuisine: "Cuisine", bar: "Bar" };
 const REGLAGES_DEFAUT = { cuisine: "192.168.192.50", bar: "192.168.192.50",
@@ -289,6 +325,10 @@ async function api(chemin, corps) {
     h.push(cmd); sauverHistorique(h);
     cmd.impression = await imprimerCommande(cmd);
     sauverHistorique(historique().map(c => c.numero === cmd.numero && c.date === cmd.date ? cmd : c));
+    const T = tablesOuvertes(), o = T[cmd.table] || (T[cmd.table] = { ouverte: cmd.date, envois: [] });
+    o.paye = false; if (cmd.couverts) o.couverts = cmd.couverts;
+    o.envois.push({ numero: cmd.numero, date: cmd.date, serveur: cmd.serveur, articles: cmd.articles, ok: cmd.impression.every(x => x.ok) });
+    sauverTables(T);
     return { numero: cmd.numero, impression: cmd.impression };
   }
   if (chemin === "/api/reimprimer") {
@@ -400,7 +440,8 @@ async function verifierEtat(force) {
 function rendreEtat() {
   const wifiOk = etat.wifi && navigator.onLine !== false;
   $("etats").innerHTML = `<button class="etat" data-detail="1"><span class="pt ${etat.wifi === null ? "" : wifiOk ? "ok" : "ko"}"></span>Wi-Fi</button>` +
-    (wifiOk ? etat.imprimantes : []).map(i => `<button class="etat" data-detail="1"><span class="pt ${i.etat}"></span>${esc(i.nom)}</button>`).join("");
+    (wifiOk ? etat.imprimantes : []).map(i => `<button class="etat" data-detail="1"><span class="pt ${i.etat}"></span>${esc(i.nom)}</button>`).join("") +
+    (utilisateur ? `<span class="qui">👤 ${esc(utilisateur)}</span>` : "");
   const pb = !wifiOk && etat.wifi !== null ? "Pas de réseau : vérifiez que l'appareil est sur le Wi-Fi L'Addition."
     : (etat.imprimantes.filter(i => ["alerte", "hors_ligne"].includes(i.etat)).map(i => i.nom + " : " + i.message).join(" · "));
   $("bandeau").textContent = pb; $("bandeau").classList.toggle("actif", !!pb);
@@ -433,7 +474,9 @@ function afficher(id) {
   $("btnRetour").style.display = id === "ecranTables" ? "none" : "";
   $("btnHistorique").style.display = id === "ecranHistorique" ? "none" : "";
   $("titre").textContent = { ecranTables: menu ? menu.restaurant : "Prise de commande",
-    ecranMenu: "Table " + table, ecranPanier: "Table " + table + " – Récap", ecranHistorique: "Historique" }[id];
+    ecranMenu: "Table " + table, ecranTable: "Table " + table, ecranPanier: "Table " + table + " – Récap", ecranHistorique: "Historique" }[id];
+  if (id === "ecranTables" && menu) rendreTables();
+  if (id === "ecranTable") rendreTable();
   if (id === "ecranMenu") rendreMenu();
   if (id === "ecranPanier") rendrePanier();
   if (id === "ecranHistorique") chargerHistorique();
@@ -442,9 +485,11 @@ function afficher(id) {
 $("btnRetour").onclick = () => {
   if (ecran === "ecranPanier") afficher("ecranMenu");
   else if (ecran === "ecranHistorique") afficher(table ? "ecranMenu" : "ecranTables");
+  else if (ecran === "ecranTable") { reinitialiser(); afficher("ecranTables"); }
   else if (ecran === "ecranMenu") {
     if (panier.length && !confirm("Abandonner la commande en cours ?")) return;
-    reinitialiser(); afficher("ecranTables");
+    if (tablesOuvertes()[table]) { panier = []; afficher("ecranTable"); }
+    else { reinitialiser(); afficher("ecranTables"); }
   }
 };
 $("btnHistorique").onclick = () => afficher("ecranHistorique");
@@ -461,7 +506,7 @@ function rendreBarre() {
     $("bTableLibre").onclick = () => choisirTable($("tableLibre").value.trim());
   } else if (ecran === "ecranMenu") {
     b.style.display = "flex";
-    b.innerHTML = `<button class="principal" ${panier.length ? "" : "disabled"} id="bVoir">Voir la commande (${nbArticles()}) · ${euros(total())}</button>`;
+    b.innerHTML = `<button class="principal" ${panier.length ? "" : "disabled"} id="bVoir">Voir la commande (${nbArticles()})</button>`;
     $("bVoir").onclick = () => afficher("ecranPanier");
   } else if (ecran === "ecranPanier") {
     b.style.display = "flex";
@@ -469,15 +514,60 @@ function rendreBarre() {
       <button class="principal" id="bEnvoyer" ${panier.length && !envoi ? "" : "disabled"}>${envoi ? "Envoi…" : "Envoyer"}</button>`;
     $("bAjout").onclick = () => afficher("ecranMenu");
     $("bEnvoyer").onclick = envoyer;
+  } else if (ecran === "ecranTable") {
+    b.style.display = "flex";
+    b.innerHTML = `<button class="principal" id="bAjoutCmd">+ Ajouter une commande</button>`;
+    $("bAjoutCmd").onclick = () => { catActive = 0; afficher("ecranMenu"); };
   } else b.style.display = "none";
 }
 $("tableLibre").addEventListener("input", rendreBarre);
-function choisirTable(t) { if (!t) return; table = t; $("tableLibre").value = ""; catActive = 0; afficher("ecranMenu"); }
+function choisirTable(t) { if (!t) return; table = t; $("tableLibre").value = ""; catActive = 0; afficher(tablesOuvertes()[t] ? "ecranTable" : "ecranMenu"); }
 
+const ZONES = [
+  { nom: "RDC", couleur: "#c2410c", tables: ["1", "2", "3", "4", "5", "6", "7", "8"] },
+  { nom: "Terrasse", couleur: "#4d7c0f", tables: ["9 gauche", "10 gauche", "11 gauche", "12 droite", "13 droite", "14 droite", "15 droite"] },
+  { nom: "-1", couleur: "#3730a3", tables: ["16", "17", "18"] }
+];
+let zoneActive = 0;
+function tablesOuvertes() { try { return JSON.parse(stock.lire("tables") || "{}"); } catch (e) { return {}; } }
+function sauverTables(t) { stock.ecrire("tables", JSON.stringify(t)); }
+function carteTable(t, o) {
+  const m = t.split(" "), nb = o ? o.envois.reduce((s, e) => s + e.articles.reduce((x, a) => x + a.quantite, 0), 0) : 0;
+  return `<button data-t="${esc(t)}" class="${o ? (o.paye ? "payee" : "occupee") : ""}"><span class="num">${esc(m[0])}</span>
+    ${m.length > 1 ? `<span class="cote">${esc(m.slice(1).join(" "))}</span>` : ""}
+    <span class="st">${o ? (o.paye ? "Payé ✓" : o.ouverte.slice(11, 16) + " · " + nb + " art.") : "Libre"}</span></button>`;
+}
 function rendreTables() {
-  let h = ""; for (let i = 1; i <= menu.nombre_tables; i++) h += `<button data-t="${i}">${i}</button>`;
-  $("grilleTables").innerHTML = h;
-  $("grilleTables").onclick = e => { const t = e.target.dataset.t; if (t) choisirTable(t); };
+  const T = tablesOuvertes();
+  $("zones").innerHTML = ZONES.map((z, i) => { const n = z.tables.filter(t => T[t]).length;
+    return `<button class="${i === zoneActive ? "actif" : ""}" data-z="${i}" style="--z:${z.couleur}">${esc(z.nom)}${n ? `<b>${n}</b>` : ""}</button>`; }).join("");
+  const z = ZONES[zoneActive];
+  $("grilleTables").innerHTML = z.tables.map(t => carteTable(t, T[t])).join("");
+  $("autresTables").innerHTML = Object.keys(T).filter(t => !ZONES.some(z => z.tables.includes(t))).map(t => carteTable(t, T[t])).join("");
+}
+$("zones").onclick = e => { const b = e.target.closest("[data-z]"); if (b) { zoneActive = +b.dataset.z; rendreTables(); } };
+$("grilleTables").onclick = $("autresTables").onclick = e => { const b = e.target.closest("[data-t]"); if (b) choisirTable(b.dataset.t); };
+
+function rendreTable() {
+  const o = tablesOuvertes()[table];
+  if (!o) { reinitialiser(); return afficher("ecranTables"); }
+  $("detailTable").innerHTML = `<div class="statut ${o.paye ? "paye" : "nonpaye"}">${o.paye ? "✓ Client a payé" : "Non payé"}
+      <small>Ouverte à ${o.ouverte.slice(11, 16)}${o.couverts ? " · " + o.couverts + " couv." : ""}</small></div>` +
+    o.envois.map(e => `<div class="ligne"><div class="envoi-tete">Commande n°${e.numero} · ${e.date.slice(11, 16)} · ${esc(e.serveur || "-")}
+        ${e.ok ? "" : `<span class="imp-ko"> ✗ non imprimée</span>`}</div>` +
+      e.articles.map(a => `<div class="art"><b>${a.quantite}×</b> ${esc(a.nom)}
+        ${a.options.length ? `<div class="det opt">${esc(a.options.join(" · "))}</div>` : ""}
+        ${a.extras.map(x => `<div class="det ext">+ ${esc(x)}</div>`).join("")}
+        ${a.retraits.map(x => `<div class="det ret">SANS ${esc(x)}</div>`).join("")}
+        ${a.note ? `<div class="det com">« ${esc(a.note)} »</div>` : ""}</div>`).join("") + `</div>`).join("") +
+    `<div class="actions-table"><button class="gros ${o.paye ? "secondaire" : "vert"}" id="bPaye">${o.paye ? "Annuler « payé »" : "✓ Client a payé"}</button>
+      <button class="gros danger" id="bLiberer">Libérer la table</button></div>`;
+  $("bPaye").onclick = () => { const T = tablesOuvertes(); T[table].paye = !T[table].paye; sauverTables(T); rendreTable(); };
+  $("bLiberer").onclick = () => {
+    const T = tablesOuvertes();
+    if (!T[table].paye && !confirm("Table " + table + " NON PAYÉE. Libérer quand même ?")) return;
+    delete T[table]; sauverTables(T); reinitialiser(); afficher("ecranTables"); toast("Table libérée", true);
+  };
 }
 
 /* ---------- Carte ---------- */
@@ -493,7 +583,6 @@ function rendreMenu() {
   $("articles").innerHTML = cat.articles.map((a, i) => {
     const n = panier.filter(l => l.nom === a.nom).reduce((s, l) => s + l.quantite, 0);
     return `<button class="article" data-i="${i}">${esc(a.nom)}
-      ${a.prix ? `<small>${euros(a.prix)}</small>` : ""}
       ${personnalisable(cat, a) ? `<span class="perso">⚙︎</span>` : ""}
       ${n ? `<span class="badge">${n}</span>` : ""}</button>`;
   }).join("");
@@ -524,7 +613,7 @@ function resumer(l) {
   const options = [], extras = [];
   groupesDe(l._cat, l._art).forEach(g => (l.choix[g.cle] || []).forEach(n => {
     const v = g.valeurs.find(v => v.nom === n) || { nom: n };
-    if (g.type === "multiple") extras.push(v.nom + (v.prix ? " (+" + v.prix + "€)" : ""));
+    if (g.type === "multiple") extras.push(v.nom);
     else options.push(v.nom);
   }));
   return { options, extras };
@@ -551,11 +640,11 @@ $("modale").onclick = e => { if (e.target.id === "modale" && !$("codeAcces")) fe
 
 function rendreFiche() {
   const l = fiche.ligne, a = l._art;
-  let h = `<div class="contenu"><div class="fiche-titre"><h2>${esc(l.nom)}</h2><span class="prix">${euros(l.prixBase)}</span></div>`;
+  let h = `<div class="contenu"><div class="fiche-titre"><h2>${esc(l.nom)}</h2></div>`;
   groupesDe(l._cat, a).forEach(g => {
-    h += `<div class="section"><h3>${esc(g.titre)}${g.type === "multiple" ? " (payant)" : ""}</h3><div class="puces">` +
+    h += `<div class="section"><h3>${esc(g.titre)}</h3><div class="puces">` +
       g.valeurs.map(v => `<button class="puce ${(l.choix[g.cle] || []).includes(v.nom) ? "on" : ""}" data-g="${g.cle}" data-v="${esc(v.nom)}">${
-        g.type === "multiple" ? "+ " : ""}${esc(v.nom)}${v.prix ? " · " + v.prix + "€" : ""}</button>`).join("") + `</div></div>`;
+        g.type === "multiple" ? "+ " : ""}${esc(v.nom)}</button>`).join("") + `</div></div>`;
   });
   if ((a.ingredients || []).length) {
     h += `<div class="section"><h3>Retirer un ingrédient</h3><div class="puces">` +
@@ -568,7 +657,7 @@ function rendreFiche() {
   h += `<div class="pied">
     ${fiche.index !== null ? `<button class="gros danger" id="fSuppr">🗑</button>` : ""}
     <div class="qte"><button data-fq="-1">−</button><span>${l.quantite}</span><button data-fq="1">+</button></div>
-    <button class="gros principal" id="fValider">${fiche.index !== null ? "Enregistrer" : "Ajouter"} · ${euros(prixUnitaire(l) * l.quantite)}</button></div>`;
+    <button class="gros principal" id="fValider">${fiche.index !== null ? "Enregistrer" : "Ajouter"}</button></div>`;
   const scroll = $("boite").querySelector(".contenu") ? $("boite").querySelector(".contenu").scrollTop : 0;
   $("boite").innerHTML = h;
   $("boite").querySelector(".contenu").scrollTop = scroll;
@@ -607,7 +696,7 @@ function rendrePanier() {
     const r = resumer(l), perso = personnalisable(l._cat, l._art);
     return `<div class="ligne">
       <div class="haut">
-        <span class="nom">${esc(l.nom)}<br><span class="prix">${euros(prixUnitaire(l) * l.quantite)}</span></span>
+        <span class="nom">${esc(l.nom)}</span>
         <div class="qte"><button data-q="-1" data-i="${i}">−</button><span>${l.quantite}</span><button data-q="1" data-i="${i}">+</button></div>
       </div>
       ${r.options.length ? `<div class="det opt">${esc(r.options.join(" · "))}</div>` : ""}
@@ -616,7 +705,7 @@ function rendrePanier() {
       ${l.note ? `<div class="det com">« ${esc(l.note)} »</div>` : ""}
       <button class="lien" data-m="${i}">${perso ? "Modifier (extras, retirer, commentaire)" : "Ajouter un commentaire"}</button>
     </div>`;
-  }).join("") + `<div class="total"><span>Total</span><span>${euros(total())}</span></div>`;
+  }).join("");
 }
 $("lignesPanier").onclick = e => {
   const d = e.target.dataset;
