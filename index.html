@@ -196,6 +196,20 @@
   .toast { border-radius:14px; top:max(16px, env(safe-area-inset-top)); box-shadow:0 8px 24px rgba(20,32,27,.25); }
   @media (min-width:600px) { .grille-tables { grid-template-columns:repeat(5,1fr); } .articles { grid-template-columns:repeat(3,1fr); } }
   @media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
+  /* ----- Suivi ----- */
+  .dash-date { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .dash-date b { font-family:"Bricolage Grotesque",sans-serif; font-size:20px; text-transform:capitalize; }
+  .dash-date button { width:44px; height:44px; border:0; border-radius:12px; background:#E6ECE7; font-size:24px; color:var(--texte); } .dash-date button:disabled { opacity:.35; }
+  .kpis { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+  .kpi { background:#fff; border:1.5px solid var(--bord); border-radius:14px; padding:12px 14px; }
+  .kpi b { display:block; font-family:"Bricolage Grotesque",sans-serif; font-size:30px; font-weight:800; line-height:1.1; font-variant-numeric:tabular-nums; }
+  .kpi span { font-size:13px; color:var(--gris); } .kpi.alerte { border-color:var(--accent); } .kpi.alerte b { color:var(--rouge); }
+  .bloc { background:#fff; border:1.5px solid var(--bord); border-radius:14px; padding:14px; margin-bottom:12px; }
+  .bloc h3 { margin:0 0 10px; font-size:15px; } .bloc p { margin:6px 0; font-size:14px; line-height:1.35; } .bloc p small { color:var(--gris); font-variant-numeric:tabular-nums; }
+  .bloc.alerte { background:var(--accent-clair); border-color:var(--accent); } .bloc.alerte h3, .bloc p.al { color:var(--rouge); } .bloc .rien { color:var(--gris); }
+  .bh { display:grid; grid-template-columns:minmax(64px,34%) 1fr auto; align-items:center; gap:8px; margin:7px 0; font-size:14px; }
+  .bh span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .bh i { height:10px; background:#E6ECE7; border-radius:5px; overflow:hidden; }
+  .bh u { display:block; height:100%; background:var(--sombre); border-radius:5px; } .bh b { font-variant-numeric:tabular-nums; } .bh b small { font-weight:400; color:var(--gris); }
 </style>
 </head>
 <body>
@@ -204,6 +218,7 @@
 <header>
   <button id="btnRetour" style="display:none">‹ Retour</button>
   <h1 id="titre">Prise de commande</h1>
+  <button id="btnSuivi" style="display:none">Suivi</button>
   <button id="btnHistorique">Envoyées</button>
   <button id="btnReglages" aria-label="Réglages">⚙︎</button>
 </header>
@@ -242,6 +257,8 @@
       <textarea id="noteGlobale" rows="2"></textarea>
     </label>
   </section>
+
+  <section class="ecran" id="ecranDashboard"><div id="dash"></div></section>
 
   <section class="ecran" id="ecranHistorique">
     <div class="titre">Commandes envoyées aujourd'hui</div>
@@ -390,6 +407,9 @@ async function api(chemin, corps) {
     const maj = { nom: cmd.table, paye: false }; if (nouvelle) maj.ouverte = cmd.date; if (cmd.couverts) maj.couverts = cmd.couverts;
     maj["envois/" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8)] = envoi;
     pousser("PATCH", "/tables/" + encodeURIComponent(cleTable(cmd.table)), maj);
+    pousser("PUT", "/journal/" + jour() + "/" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      { numero: cmd.numero, date: cmd.date, table: cmd.table, serveur: cmd.serveur, ok: envoi.ok,
+        articles: cmd.articles.map(a => ({ nom: a.nom, quantite: a.quantite, categorie: a.categorie })) });
     return { numero: cmd.numero, impression: cmd.impression };
   }
   if (chemin === "/api/reimprimer") {
@@ -405,11 +425,13 @@ function ouvrirReglages() {
   if (utilisateur !== GERANT) {
     fiche = null;
     $("boite").innerHTML = `<div class="contenu"><div class="titre">Connecté : ${esc(utilisateur || "-")}</div>
-      <p style="color:var(--gris)">Les réglages imprimantes sont réservés au responsable.</p></div>
+      <p style="color:var(--gris)">Les réglages imprimantes sont réservés au responsable.</p>
+      <p><button class="lien" id="rMaj">Mettre l'app à jour</button></p></div>
       <div class="pied"><button class="gros secondaire" id="rFermer" style="flex:1 !important">Fermer</button>
       <button class="gros danger" id="rDeco" style="flex:1 !important">Changer d'utilisateur</button></div>`;
     $("modale").classList.add("actif");
     $("rFermer").onclick = () => $("modale").classList.remove("actif");
+    $("rMaj").onclick = () => location.reload();
     $("rDeco").onclick = deconnecter;
     return;
   }
@@ -422,12 +444,12 @@ function ouvrirReglages() {
     <p style="font-size:14px;color:var(--gris)">Connexion : <b>${esc(r.protocole.toUpperCase())}</b>.
     Première fois sur cet appareil : ${lienCert(r.cuisine)} dans Safari, touchez « Afficher les détails » → « visiter ce site web » pour accepter le certificat de l'imprimante, puis revenez ici.</p>
     ${r.bar && r.bar !== r.cuisine ? `<p style="font-size:14px">${lienCert(r.bar)}</p>` : ""}</div>
-    <p><button class="lien" id="rDeco">Changer d'utilisateur (${esc(utilisateur)})</button></p>
+    <p><button class="lien" id="rDeco">Changer d'utilisateur (${esc(utilisateur)})</button> &nbsp; <button class="lien" id="rMaj">Mettre l'app à jour</button></p>
     <div class="pied"><button class="gros secondaire" id="rTest" style="flex:1 !important">Ticket test</button>
     <button class="gros principal" id="rOk">Enregistrer</button></div>`;
   $("modale").classList.add("actif");
   const lire = () => ({ cuisine: $("rCuisine").value.trim(), bar: $("rBar").value.trim(), devid: $("rDevid").value.trim() || "local_printer", protocole: r.protocole });
-  $("rDeco").onclick = deconnecter;
+  $("rDeco").onclick = deconnecter; $("rMaj").onclick = () => location.reload();
   $("rOk").onclick = () => { stock.ecrire("reglages", JSON.stringify(lire())); cacheEtat.v = null; $("modale").classList.remove("actif"); verifierEtat(true); };
   $("rTest").onclick = async () => {
     stock.ecrire("reglages", JSON.stringify(lire())); cacheEtat.v = null;
@@ -616,18 +638,21 @@ function afficher(id) {
   document.querySelectorAll(".ecran").forEach(e => e.classList.toggle("actif", e.id === id));
   $("btnRetour").style.display = id === "ecranTables" ? "none" : "";
   $("btnHistorique").style.display = id === "ecranHistorique" ? "none" : "";
+  $("btnSuivi").style.display = id === "ecranTables" && utilisateur === GERANT ? "" : "none";
   $("titre").textContent = { ecranTables: menu ? menu.restaurant : "Prise de commande",
-    ecranMenu: "Table " + table, ecranTable: "Table " + table, ecranPanier: "Table " + table + " – Récap", ecranHistorique: "Historique" }[id];
+    ecranMenu: "Table " + table, ecranTable: "Table " + table, ecranPanier: "Table " + table + " – Récap", ecranHistorique: "Historique", ecranDashboard: "Suivi" }[id];
   if (id === "ecranTables" && menu) rendreTables();
   if (id === "ecranTable") rendreTable();
   if (id === "ecranMenu") rendreMenu();
   if (id === "ecranPanier") rendrePanier();
   if (id === "ecranHistorique") chargerHistorique();
+  if (id === "ecranDashboard") chargerDashboard();
   rendreBarre(); window.scrollTo(0, 0);
 }
 $("btnRetour").onclick = () => {
   if (ecran === "ecranPanier") afficher("ecranMenu");
   else if (ecran === "ecranHistorique") afficher(table ? "ecranMenu" : "ecranTables");
+  else if (ecran === "ecranDashboard") afficher("ecranTables");
   else if (ecran === "ecranTable") { reinitialiser(); afficher("ecranTables"); }
   else if (ecran === "ecranMenu") {
     sauverBrouillon();
@@ -722,11 +747,13 @@ function rendreTable() {
      <div class="actions-table"><button class="gros secondaire" id="bDeplacer">Changer de table</button></div>`;
   const chemin = t => "/tables/" + encodeURIComponent(cleTable(t));
   $("bPaye").onclick = () => { const T = tablesOuvertes(); T[table].paye = !T[table].paye; sauverTables(T);
-    pousser("PATCH", chemin(table), { paye: T[table].paye }); rendreTable(); };
+    pousser("PATCH", chemin(table), { paye: T[table].paye });
+    evenement({ type: T[table].paye ? "paye" : "annule_paye", table }); rendreTable(); };
   $("bLiberer").onclick = () => {
     const T = tablesOuvertes();
     if (!T[table].paye && !confirm("Table " + table + " NON PAYÉE. Libérer quand même ?")) return;
-    delete T[table]; sauverTables(T); pousser("DELETE", chemin(table));
+    const anc = T[table]; delete T[table]; sauverTables(T); pousser("DELETE", chemin(table));
+    evenement({ type: "libere", table, paye: !!anc.paye, ouverte: anc.ouverte });
     panier = []; sauverBrouillon(); reinitialiser(); afficher("ecranTables"); toast("Table libérée", true);
   };
   $("bDeplacer").onclick = () => {
@@ -742,7 +769,7 @@ function rendreTable() {
       o.envois.forEach((e, i) => { env["d" + Date.now().toString(36) + i] = e; });
       T[dest] = o; delete T[table]; sauverTables(T);
       pousser("PUT", chemin(dest), { nom: dest, ouverte: o.ouverte, paye: !!o.paye, couverts: o.couverts || 0, envois: env });
-      pousser("DELETE", chemin(table));
+      pousser("DELETE", chemin(table)); evenement({ type: "deplace", table, vers: dest });
       const B = brouillons(); if (B[table]) { B[dest] = B[table]; delete B[table]; stock.ecrire("brouillons", JSON.stringify(B)); }
       $("modale").classList.remove("actif"); toast("Table " + table + " déplacée en " + dest, true);
       table = dest; afficher("ecranTable");
@@ -987,6 +1014,68 @@ function chargerBrouillon(t) {
 $("noteGlobale").addEventListener("input", sauverBrouillon);
 $("zoneCouverts").addEventListener("click", sauverBrouillon);
 $("bVider").onclick = () => { if (!panier.length || !confirm("Vider la commande en attente ?")) return; panier = []; sauverBrouillon(); rendrePanier(); rendreBarre(); };
+
+/* ---------- Suivi (réservé au responsable) ---------- */
+function evenement(e) {
+  pousser("PUT", "/evenements/" + jour() + "/" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    Object.assign({ par: utilisateur, date: horodatage() }, e));
+}
+$("btnSuivi").onclick = () => { jourDash = jour(); afficher("ecranDashboard"); };
+let jourDash = null;
+function decalerJour(j, n) { const d = new Date(j + "T12:00:00"); d.setDate(d.getDate() + n); return d.getFullYear() + "-" + p2(d.getMonth() + 1) + "-" + p2(d.getDate()); }
+async function chargerDashboard(silencieux) {
+  if (utilisateur !== GERANT) return afficher("ecranTables");
+  if (!jourDash) jourDash = jour();
+  if (!silencieux) $("dash").innerHTML = `<div class="vide">Chargement…</div>`;
+  let J, E;
+  try { [J, E] = await Promise.all([fb("GET", "/journal/" + jourDash), fb("GET", "/evenements/" + jourDash)]); }
+  catch (e) { if (!silencieux) $("dash").innerHTML = `<div class="vide">Données injoignables. Vérifiez la connexion internet, puis réessayez.</div>`; return; }
+  if (ecran === "ecranDashboard") rendreDashboard(Object.values(J || {}), Object.values(E || {}));
+}
+setInterval(() => { if (ecran === "ecranDashboard" && !document.hidden) chargerDashboard(true); }, 30000);
+function barres(lignes) {
+  const max = Math.max(1, ...lignes.map(l => l[1]));
+  return lignes.map(l => `<div class="bh"><span>${esc(l[0])}</span><i><u style="width:${Math.round(l[1] / max * 100)}%"></u></i><b>${l[1]}${l[2] ? `<small> ${esc(l[2])}</small>` : ""}</b></div>`).join("");
+}
+function rendreDashboard(cmds, evs) {
+  const nbArt = c => (c.articles || []).reduce((s, a) => s + a.quantite, 0);
+  const articles = cmds.reduce((s, c) => s + nbArt(c), 0);
+  const liberees = evs.filter(e => e.type === "libere"), impayees = liberees.filter(e => !e.paye), nonImp = cmds.filter(c => c.ok === false);
+  const durees = liberees.filter(e => e.ouverte).map(e => (new Date(e.date) - new Date(e.ouverte)) / 60000).filter(m => m >= 0);
+  const moy = durees.length ? Math.round(durees.reduce((a, b) => a + b, 0) / durees.length) : null;
+  const T = tablesOuvertes(), ouvertes = Object.keys(T), aEncaisser = ouvertes.filter(t => !T[t].paye);
+  const parServeur = {}, parArticle = {}, parHeure = {};
+  cmds.forEach(c => {
+    const s = parServeur[c.serveur || "-"] || (parServeur[c.serveur || "-"] = { c: 0, a: 0 }); s.c++; s.a += nbArt(c);
+    (c.articles || []).forEach(a => { parArticle[a.nom] = (parArticle[a.nom] || 0) + a.quantite; });
+    const h = c.date.slice(11, 13); parHeure[h] = (parHeure[h] || 0) + 1;
+  });
+  const aujourd = jourDash === jour();
+  const titre = aujourd ? "Aujourd'hui" : new Date(jourDash + "T12:00:00").toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+  const phrase = e => ({ paye: "a marqué payée la table " + e.table, annule_paye: "a annulé « payé » sur la table " + e.table,
+    libere: "a libéré la table " + e.table + (e.paye ? "" : " sans paiement"), deplace: "a déplacé la table " + e.table + " en " + e.vers }[e.type] || e.type);
+  const fil = cmds.map(c => ({ d: c.date, qui: c.serveur || "-", t: "a envoyé la commande n°" + c.numero + ", table " + c.table + " (" + nbArt(c) + " art.)", al: c.ok === false }))
+    .concat(evs.map(e => ({ d: e.date, qui: e.par || "-", t: phrase(e), al: e.type === "libere" && !e.paye })))
+    .sort((a, b) => b.d.localeCompare(a.d)).slice(0, 30);
+  $("dash").innerHTML = `<div class="dash-date"><button id="dPrec" aria-label="Jour précédent">‹</button><b>${esc(titre)}</b><button id="dSuiv" aria-label="Jour suivant" ${aujourd ? "disabled" : ""}>›</button></div>
+    <div class="kpis">
+      <div class="kpi"><b>${cmds.length}</b><span>commandes envoyées</span></div>
+      <div class="kpi"><b>${articles}</b><span>articles</span></div>
+      <div class="kpi"><b>${liberees.length}</b><span>tables terminées</span></div>
+      <div class="kpi"><b>${moy === null ? "–" : moy + " min"}</b><span>durée moyenne d'une table</span></div>
+      ${aujourd ? `<div class="kpi"><b>${ouvertes.length}</b><span>tables en cours</span></div>
+      <div class="kpi ${aEncaisser.length ? "alerte" : ""}"><b>${aEncaisser.length}</b><span>tables à encaisser</span></div>` : ""}
+    </div>
+    ${impayees.length || nonImp.length ? `<div class="bloc alerte"><h3>À vérifier</h3>
+      ${impayees.map(e => `<p>${e.date.slice(11, 16)}, table ${esc(e.table)} libérée sans paiement par ${esc(e.par || "-")}</p>`).join("")}
+      ${nonImp.map(c => `<p>${c.date.slice(11, 16)}, commande n°${c.numero} (table ${esc(c.table)}) non imprimée</p>`).join("")}</div>` : ""}
+    <div class="bloc"><h3>Par serveur</h3>${Object.keys(parServeur).length ? barres(Object.entries(parServeur).sort((a, b) => b[1].c - a[1].c).map(([n, v]) => [n, v.c, "cmd, " + v.a + " art."])) : `<p class="rien">Aucune commande ce jour-là</p>`}</div>
+    <div class="bloc"><h3>Commandes par heure</h3>${barres(Object.keys(parHeure).sort().map(h => [h + " h", parHeure[h]])) || `<p class="rien">Aucune commande ce jour-là</p>`}</div>
+    <div class="bloc"><h3>Articles les plus commandés</h3>${barres(Object.entries(parArticle).sort((a, b) => b[1] - a[1]).slice(0, 8)) || `<p class="rien">Aucune commande ce jour-là</p>`}</div>
+    <div class="bloc"><h3>Activité</h3>${fil.map(f => `<p class="${f.al ? "al" : ""}"><small>${f.d.slice(11, 16)}</small> <b>${esc(f.qui)}</b> ${esc(f.t)}</p>`).join("") || `<p class="rien">Rien pour l'instant</p>`}</div>`;
+  $("dPrec").onclick = () => { jourDash = decalerJour(jourDash, -1); chargerDashboard(); };
+  $("dSuiv").onclick = () => { jourDash = decalerJour(jourDash, 1); chargerDashboard(); };
+}
 
 async function demarrer() {
   utilisateur = await verifierCode(stock.lire("code"));
