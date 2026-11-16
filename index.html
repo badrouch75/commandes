@@ -320,15 +320,18 @@ async function api(chemin, corps) {
   if (chemin === "/api/commandes") return historique().filter(c => c.date.startsWith(jour())).reverse().slice(0, 50);
   if (chemin === "/api/commande") {
     const h = historique(), nums = h.filter(c => c.date.startsWith(jour())).map(c => c.numero);
-    const cmd = { numero: nums.length ? Math.max(...nums) + 1 : 1, date: horodatage(), table: String(corps.table).slice(0, 10),
+    const cmd = { numero: await numeroPartage(nums.length ? Math.max(...nums) + 1 : 1), date: horodatage(), table: String(corps.table).slice(0, 10),
       serveur: corps.serveur || "", couverts: corps.couverts, note: corps.note || "", articles: corps.articles };
     h.push(cmd); sauverHistorique(h);
     cmd.impression = await imprimerCommande(cmd);
     sauverHistorique(historique().map(c => c.numero === cmd.numero && c.date === cmd.date ? cmd : c));
-    const T = tablesOuvertes(), o = T[cmd.table] || (T[cmd.table] = { ouverte: cmd.date, envois: [] });
+    const T = tablesOuvertes(), nouvelle = !T[cmd.table], o = T[cmd.table] || (T[cmd.table] = { ouverte: cmd.date, envois: [] });
     o.paye = false; if (cmd.couverts) o.couverts = cmd.couverts;
-    o.envois.push({ numero: cmd.numero, date: cmd.date, serveur: cmd.serveur, articles: cmd.articles, ok: cmd.impression.every(x => x.ok) });
-    sauverTables(T);
+    const envoi = { numero: cmd.numero, date: cmd.date, serveur: cmd.serveur, articles: cmd.articles, ok: cmd.impression.every(x => x.ok) };
+    o.envois.push(envoi); sauverTables(T);
+    const maj = { nom: cmd.table, paye: false }; if (nouvelle) maj.ouverte = cmd.date; if (cmd.couverts) maj.couverts = cmd.couverts;
+    maj["envois/" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8)] = envoi;
+    pousser("PATCH", "/tables/" + encodeURIComponent(cleTable(cmd.table)), maj);
     return { numero: cmd.numero, impression: cmd.impression };
   }
   if (chemin === "/api/reimprimer") {
@@ -378,7 +381,7 @@ function ouvrirReglages() {
     toast(rap[0].ok ? (rap[0].test ? "Mode test : pas d'IP" : "✓ Ticket test imprimé") : rap[0].erreur, rap[0].ok);
   };
 }
-function deconnecter() { stock.ecrire("code", ""); utilisateur = null; reinitialiser(); $("serveur").value = ""; demanderCodeForce(); }
+function deconnecter() { stock.ecrire("code", ""); utilisateur = null; fbBase = null; try { if (flux) flux.close(); } catch (e) {} reinitialiser(); $("serveur").value = ""; demanderCodeForce(); }
 $("btnReglages").onclick = ouvrirReglages;
 
 
@@ -391,6 +394,87 @@ async function empreinte(code) {
 }
 let utilisateur = null;
 async function verifierCode(code) { return code ? EMPLOYES[await empreinte(code)] || null : null; }
+
+/* ---------- Partage des tables entre appareils (Firebase Realtime Database, API REST) ---------- */
+const FB = stock.lire("fb_test") || "https://triomfe-default-rtdb.europe-west1.firebasedatabase.app";
+const CLES = {"16b5625211e28a45f4d98d49ed5341ed125e4db1989c779012e4cf1e2827a2ad": "9e876ed9ad536b9fbbbc087f8b5862b5ca20eda9ff4137d1", "a374b4729468a1396b1bc27691fb286d8c4d28c138df92e9396cf7d1f88042f5": "b722183821614ca075d59cee6f8d1d8032799df12540e178", "891a46691d312680cd0b34597ed2b54454b8ace0e2f3038bf33712140e6e46aa": "1351fb1892f301e0f81bf6b9f056740c96724a9daa496f4a"};
+let fbBase = null, syncOk = null, flux = null;
+async function initSync(code) {
+  fbBase = null;
+  const enc = CLES[await empreinte(code)]; if (!enc) return;
+  const k = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("cle:triomfe-cmd" + code)));
+  let sec = ""; for (let i = 0; i < enc.length / 2; i++) sec += String.fromCharCode(parseInt(enc.substr(i * 2, 2), 16) ^ k[i]);
+  fbBase = FB + "/r/" + sec;
+  ouvrirFlux(); rafraichir();
+}
+const cleTable = t => String(t).replace(/[.$#\[\]\/]/g, "_");
+function fileAttente() { try { return JSON.parse(stock.lire("file_sync") || "[]"); } catch (e) { return []; } }
+async function fb(methode, chemin, corps) {
+  const ctrl = new AbortController(), t = setTimeout(() => ctrl.abort(), 6000);
+  try {
+    const r = await fetch(fbBase + chemin + ".json", { method: methode, body: corps === undefined ? undefined : JSON.stringify(corps), signal: ctrl.signal, cache: "no-store" });
+    if (!r.ok) throw new Error("sync " + r.status);
+    return await r.json();
+  } finally { clearTimeout(t); }
+}
+let vidage = Promise.resolve(true);
+function vider() {
+  return vidage = vidage.then(async () => {
+    if (!fbBase) return false;
+    for (;;) {
+      const f = fileAttente(); if (!f.length) return true;
+      try { await fb(f[0].m, f[0].p, f[0].b); } catch (e) { return false; }
+      const g = fileAttente(); g.shift(); stock.ecrire("file_sync", JSON.stringify(g));
+    }
+  });
+}
+function pousser(m, p, b) {
+  const f = fileAttente(); f.push({ m, p, b }); stock.ecrire("file_sync", JSON.stringify(f));
+  vider().then(ok => { syncOk = ok; rendreEtat(); });
+}
+function appliquerDistant(data) {
+  if (fileAttente().length) return;
+  const T = {};
+  Object.keys(data || {}).forEach(k => {
+    const o = data[k] || {};
+    const envois = Object.values(o.envois || {}).map(e => Object.assign({}, e, { articles: (e.articles || []).map(a =>
+      Object.assign({}, a, { options: a.options || [], extras: a.extras || [], retraits: a.retraits || [], note: a.note || "" })) }))
+      .sort((a, b) => (a.date + a.numero).localeCompare(b.date + b.numero));
+    if (!envois.length) return;
+    T[o.nom || k] = { ouverte: o.ouverte || envois[0].date, paye: !!o.paye, couverts: o.couverts || 0, envois };
+  });
+  if (JSON.stringify(T) === JSON.stringify(tablesOuvertes())) return;
+  sauverTables(T);
+  if (ecran === "ecranTables" && menu) rendreTables();
+  if (ecran === "ecranTable" && !$("modale").classList.contains("actif")) rendreTable();
+}
+let enCours = false;
+async function rafraichir() {
+  if (!fbBase || enCours) return; enCours = true;
+  try { if (await vider()) { appliquerDistant(await fb("GET", "/tables")); syncOk = true; } else syncOk = false; }
+  catch (e) { syncOk = false; }
+  enCours = false; rendreEtat();
+}
+let minuterie = null;
+const rafraichirBientot = () => { clearTimeout(minuterie); minuterie = setTimeout(rafraichir, 300); };
+function ouvrirFlux() {
+  try { if (flux) flux.close(); } catch (e) {}
+  flux = null; if (!fbBase || !window.EventSource) return;
+  try { flux = new EventSource(fbBase + "/tables.json"); flux.addEventListener("put", rafraichirBientot); flux.addEventListener("patch", rafraichirBientot); } catch (e) {}
+}
+setInterval(() => { if (!document.hidden && fbBase) { if (!flux || flux.readyState === 2) ouvrirFlux(); rafraichir(); } }, 20000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden && fbBase) { ouvrirFlux(); rafraichir(); } });
+async function numeroPartage(local) {
+  if (!fbBase) return local;
+  try {
+    const ctrl = new AbortController(), t = setTimeout(() => ctrl.abort(), 2500), u = fbBase + "/compteur/" + jour() + ".json";
+    try {
+      const v = (await (await fetch(u, { signal: ctrl.signal, cache: "no-store" })).json()) || 0, n = Math.max(v, local - 1) + 1;
+      await fetch(u, { method: "PUT", body: JSON.stringify(n), signal: ctrl.signal });
+      return n;
+    } finally { clearTimeout(t); }
+  } catch (e) { return local; }
+}
 
 function demanderCodeForce(erreur) { $("modale").classList.remove("actif"); demanderCode(erreur); }
 function demanderCode(erreur) {
@@ -441,6 +525,7 @@ function rendreEtat() {
   const wifiOk = etat.wifi && navigator.onLine !== false;
   $("etats").innerHTML = `<button class="etat" data-detail="1"><span class="pt ${etat.wifi === null ? "" : wifiOk ? "ok" : "ko"}"></span>Wi-Fi</button>` +
     (wifiOk ? etat.imprimantes : []).map(i => `<button class="etat" data-detail="1"><span class="pt ${i.etat}"></span>${esc(i.nom)}</button>`).join("") +
+    (fbBase ? `<button class="etat" data-detail="1"><span class="pt ${syncOk === null ? "" : syncOk ? "ok" : "ko"}"></span>Partage</button>` : "") +
     (utilisateur ? `<span class="qui">👤 ${esc(utilisateur)}</span>` : "");
   const pb = !wifiOk && etat.wifi !== null ? "Pas de réseau : vérifiez que l'appareil est sur le Wi-Fi L'Addition."
     : (etat.imprimantes.filter(i => ["alerte", "hors_ligne"].includes(i.etat)).map(i => i.nom + " : " + i.message).join(" · "));
@@ -562,11 +647,12 @@ function rendreTable() {
         ${a.note ? `<div class="det com">« ${esc(a.note)} »</div>` : ""}</div>`).join("") + `</div>`).join("") +
     `<div class="actions-table"><button class="gros ${o.paye ? "secondaire" : "vert"}" id="bPaye">${o.paye ? "Annuler « payé »" : "✓ Client a payé"}</button>
       <button class="gros danger" id="bLiberer">Libérer la table</button></div>`;
-  $("bPaye").onclick = () => { const T = tablesOuvertes(); T[table].paye = !T[table].paye; sauverTables(T); rendreTable(); };
+  $("bPaye").onclick = () => { const T = tablesOuvertes(); T[table].paye = !T[table].paye; sauverTables(T);
+    pousser("PATCH", "/tables/" + encodeURIComponent(cleTable(table)), { paye: T[table].paye }); rendreTable(); };
   $("bLiberer").onclick = () => {
     const T = tablesOuvertes();
     if (!T[table].paye && !confirm("Table " + table + " NON PAYÉE. Libérer quand même ?")) return;
-    delete T[table]; sauverTables(T); reinitialiser(); afficher("ecranTables"); toast("Table libérée", true);
+    delete T[table]; sauverTables(T); pousser("DELETE", "/tables/" + encodeURIComponent(cleTable(table))); reinitialiser(); afficher("ecranTables"); toast("Table libérée", true);
   };
 }
 
@@ -775,6 +861,7 @@ async function demarrer() {
   utilisateur = await verifierCode(stock.lire("code"));
   if (!utilisateur) { stock.ecrire("code", ""); demanderCode(); throw new CodeRequis("Code requis"); }
   $("serveur").value = utilisateur; $("serveur").readOnly = true; stock.ecrire("serveur", utilisateur);
+  initSync(stock.lire("code"));
   const m = await api("/api/menu");
   menu = m; menu.groupes = menu.groupes || {};
   rendreTables(); afficher("ecranTables"); verifierEtat();
