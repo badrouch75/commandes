@@ -301,6 +301,17 @@ async function api(chemin, corps) {
 
 /* --- Réglages --- */
 function ouvrirReglages() {
+  if (utilisateur !== GERANT) {
+    fiche = null;
+    $("boite").innerHTML = `<div class="contenu"><div class="titre">Connecté : ${esc(utilisateur || "-")}</div>
+      <p style="color:var(--gris)">Les réglages imprimantes sont réservés au responsable.</p></div>
+      <div class="pied"><button class="gros secondaire" id="rFermer" style="flex:1 !important">Fermer</button>
+      <button class="gros danger" id="rDeco" style="flex:1 !important">Changer d'utilisateur</button></div>`;
+    $("modale").classList.add("actif");
+    $("rFermer").onclick = () => $("modale").classList.remove("actif");
+    $("rDeco").onclick = deconnecter;
+    return;
+  }
   const r = reglages(); fiche = null;
   const lienCert = ip => ip ? `<a href="https://${esc(ip)}" target="_blank" rel="noopener" style="color:var(--accent)">Ouvrir https://${esc(ip)}</a>` : "";
   $("boite").innerHTML = `<div class="contenu"><div class="titre">Réglages imprimantes</div>
@@ -310,10 +321,12 @@ function ouvrirReglages() {
     <p style="font-size:14px;color:var(--gris)">Connexion : <b>${esc(r.protocole.toUpperCase())}</b>.
     Première fois sur cet appareil : ${lienCert(r.cuisine)} dans Safari, touchez « Afficher les détails » → « visiter ce site web » pour accepter le certificat de l'imprimante, puis revenez ici.</p>
     ${r.bar && r.bar !== r.cuisine ? `<p style="font-size:14px">${lienCert(r.bar)}</p>` : ""}</div>
+    <p><button class="lien" id="rDeco">Changer d'utilisateur (${esc(utilisateur)})</button></p>
     <div class="pied"><button class="gros secondaire" id="rTest" style="flex:1 !important">Ticket test</button>
     <button class="gros principal" id="rOk">Enregistrer</button></div>`;
   $("modale").classList.add("actif");
   const lire = () => ({ cuisine: $("rCuisine").value.trim(), bar: $("rBar").value.trim(), devid: $("rDevid").value.trim() || "local_printer", protocole: r.protocole });
+  $("rDeco").onclick = deconnecter;
   $("rOk").onclick = () => { stock.ecrire("reglages", JSON.stringify(lire())); cacheEtat.v = null; $("modale").classList.remove("actif"); verifierEtat(true); };
   $("rTest").onclick = async () => {
     stock.ecrire("reglages", JSON.stringify(lire())); cacheEtat.v = null;
@@ -325,23 +338,41 @@ function ouvrirReglages() {
     toast(rap[0].ok ? (rap[0].test ? "Mode test : pas d'IP" : "✓ Ticket test imprimé") : rap[0].erreur, rap[0].ok);
   };
 }
+function deconnecter() { stock.ecrire("code", ""); utilisateur = null; reinitialiser(); $("serveur").value = ""; demanderCodeForce(); }
 $("btnReglages").onclick = ouvrirReglages;
 
+
+/* ---------- Codes employés (empreintes SHA-256, le code n'est pas écrit en clair) ---------- */
+const EMPLOYES = {"16b5625211e28a45f4d98d49ed5341ed125e4db1989c779012e4cf1e2827a2ad": "Roza", "a374b4729468a1396b1bc27691fb286d8c4d28c138df92e9396cf7d1f88042f5": "Momo", "891a46691d312680cd0b34597ed2b54454b8ace0e2f3038bf33712140e6e46aa": "Bader"};
+const GERANT = "Bader";
+async function empreinte(code) {
+  const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("triomfe-cmd" + code));
+  return Array.from(new Uint8Array(d)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+let utilisateur = null;
+async function verifierCode(code) { return code ? EMPLOYES[await empreinte(code)] || null : null; }
+
+function demanderCodeForce(erreur) { $("modale").classList.remove("actif"); demanderCode(erreur); }
 function demanderCode(erreur) {
   if ($("modale").classList.contains("actif") && $("codeAcces")) return;
   fiche = null;
-  $("boite").innerHTML = `<div class="contenu code"><div class="titre">Code d'accès</div>
-    <p style="color:var(--gris);margin-top:0">Demandez le code au responsable. Il n'est demandé qu'une fois sur ce téléphone.</p>
+  $("boite").innerHTML = `<div class="contenu code"><div class="titre">Votre code personnel</div>
+    <p style="color:var(--gris);margin-top:0">Code à 4 chiffres donné par le responsable. Demandé une seule fois sur ce téléphone.</p>
     ${erreur ? `<p class="imp-ko">${esc(erreur)}</p>` : ""}
-    <input id="codeAcces" type="password" inputmode="numeric" autocomplete="off" maxlength="12"></div>
+    <input id="codeAcces" type="password" inputmode="numeric" autocomplete="off" maxlength="4" pattern="[0-9]*"></div>
     <div class="pied"><button class="gros principal" id="bCode">Valider</button></div>`;
   $("modale").classList.add("actif");
   setTimeout(() => $("codeAcces") && $("codeAcces").focus(), 100);
-  $("bCode").onclick = async () => {
-    stock.ecrire("code", $("codeAcces").value.trim());
+  const valider = async () => {
+    const c = $("codeAcces").value.trim();
+    if (!(await verifierCode(c))) { stock.ecrire("code", ""); demanderCodeForce("Code incorrect"); return; }
+    stock.ecrire("code", c);
     $("modale").classList.remove("actif");
-    try { await demarrer(); } catch (e) { if (!(e instanceof CodeRequis)) toast(e.message, false); }
+    try { await demarrer(); } catch (e) { toast(e.message, false); }
   };
+  $("bCode").onclick = valider;
+  $("codeAcces").oninput = () => { if ($("codeAcces").value.trim().length === 4) valider(); };
+  $("codeAcces").onkeydown = e => { if (e.key === "Enter") valider(); };
 }
 
 $("serveur").value = stock.lire("serveur");
@@ -356,6 +387,7 @@ $("toast").onclick = () => $("toast").style.display = "none";
 /* ---------- Etat Wi-Fi / imprimantes ---------- */
 let etat = { wifi: null, imprimantes: [], heure: "" };
 async function verifierEtat(force) {
+  if (!utilisateur) return;
   try {
     const r = await api("/api/etat" + (force ? "?force=1" : ""));
     etat = { wifi: true, imprimantes: r.imprimantes, heure: r.heure };
@@ -651,6 +683,9 @@ $("listeHistorique").onclick = async e => {
 };
 
 async function demarrer() {
+  utilisateur = await verifierCode(stock.lire("code"));
+  if (!utilisateur) { stock.ecrire("code", ""); demanderCode(); throw new CodeRequis("Code requis"); }
+  $("serveur").value = utilisateur; $("serveur").readOnly = true; stock.ecrire("serveur", utilisateur);
   const m = await api("/api/menu");
   menu = m; menu.groupes = menu.groupes || {};
   rendreTables(); afficher("ecranTables"); verifierEtat();
