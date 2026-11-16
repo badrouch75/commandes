@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1f2937">
+<title>Prise de commande</title>
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD0eNT6AAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAACAKADAAQAAAABAAACAAAAAAAoMJe/AAA5rklEQVR4Ae3dB5gkR3kw4Nq8l3UiCIPAZBNMkAkCRBDBIDKYKDLmJyMwYHIGI7AxydhkI5IFIgmDAQcQmCSyiCYabIIAC0mni5v3r2ppxd7tTnfP9Oze1vRbela3N13VXfVW38w33dVVQ+ecuG0xSAQIECBAgECrBIZb1VqNJUCAAAECBAoBAYATgQABAgQItFBAANDCTtdkAgQIECAgAHAOECBAgACBFgoIAFrY6ZpMgAABAgQEAM4BAgQIECDQQgEBQAs7XZMJECBAgIAAwDlAgAABAgRaKCAAaGGnazIBAgQIEBAAOAcIECBAgEALBQQALex0TSZAgAABAgIA5wABAgQIEGihgACghZ2uyQQIECBAQADgHCBAgAABAi0UEAC0sNM1mQABAgQICACcAwQIECBAoIUCAoAWdromEyBAgAABAYBzgAABAgQItFBAANDCTtdkAgQIECAgAHAOECBAgACBFgoIAFrY6ZpMgAABAgQEAM4BAgQIECDQQgEBQAs7XZMJECBAgIAAwDlAgAABAgRaKCAAaGGnazIBAgQIEBAAOAcIECBAgEALBQQALex0TSZAgAABAgIA5wABAgQIEGihgACghZ2uyQQIECBAQADgHCBAgAABAi0UEAC0sNM1mQABAgQICACcAwQIECBAoIUCAoAWdromEyBAgAABAYBzgAABAgQItFBAANDCTtdkAgQIECAgAHAOECBAgACBFgoIAFrY6ZpMgAABAgQEAM4BAgQIECDQQgEBQAs7XZMJECBAgIAAwDlAgAABAgRaKCAAaGGnazIBAgQIEBAAOAcIECBAgEALBQQALex0TSZAgAABAgIA5wABAgQIEGihgACghZ2uyQQIECBAQADgHCBAgAABAi0UEAC0sNM1mQABAgQICACcAwQIECBAoIUCAoAWdromEyBAgAABAYBzgAABAgQItFBAANDCTtdkAgQIECAgAHAOECBAgACBFgoIAFrY6ZpMgAABAgQEAM4BAgQIECDQQgEBQAs7XZMJECBAgIAAwDlAgAABAgRaKCAAaGGnazIBAgQIEBAAOAcIECBAgEALBQQALex0TSZAgAABAgIA5wABAgQIEGihgACghZ2uyQQIECBAQADgHCBAgAABAi0UEAC0sNM1mQABAgQICACcAwQIECBAoIUCAoAWdromEyBAgAABAYBzgAABAgQItFBAANDCTtdkAgQIECAgAHAOECBAgACBFgoIAFrY6ZpMgAABAgQEAM4BAgQIECDQQgEBQAs7XZMJECBAgIAAwDlAgAABAgRaKCAAaGGnazIBAgQIEBAAOAcIECBAgEALBQQALex0TSZAgAABAgIA5wABAgQIEGihgACghZ2uyQQIECBAQADgHCBAgAABAi0UEAC0sNM1mQABAgQICACcAwQIECBAoIUCAoAWdromEyBAgAABAYBzgAABAgQItFBAANDCTtdkAgQIECAgAHAOECBAgACBFgoIAFrY6ZpMgAABAgQEAM4BAgQIECDQQgEBQAs7XZMJECBAgIAAwDlAgAABAgRaKCAAaGGnazIBAgQIEBAAOAcIECBAgEALBQQALex0TSZAgAABAgIA5wABAgQIEGihgACghZ2uyQQIECBAQADgHCBAgAABAi0UEAC0sNM1mQABAgQICACcAwQIECBAoIUCAoAWdromEyBAgAABAYBzgAABAgQItFBAANDCTtdkAgQIECAgAHAOECBAgACBFgoIAFrY6ZpMgAABAgQEAM4BAgQIECDQQgEBQAs7XZMJECBAgIAAwDlAgAABAgRaKCAAaGGnazIBAgQIEBAAOAcIECBAgEALBQQALex0TSZAgAABAgIA5wABAgQIEGihgACghZ2uyQQIECBAQADgHCBAgAABAi0UEAC0sNM1mQABAgQICACcAwQIECBAoIUCAoAWdromEyBAgAABAYBzgAABAgQItFBAANDCTtdkAgQIECAgAHAOECBAgACBFgoIAFrY6ZpMgAABAgQEAM4BAgQIECDQQgEBQAs7XZMJECBAgIAAwDlAgAABAgRaKCAAaGGnazIBAgQIEBAAOAcIECBAgEALBQQALex0TSZAgAABAgIA5wABAgQIEGihgACghZ2uyQQIECBAQADgHCBAgAABAi0UEAC0sNM1mQABAgQICACcAwQIECBAoIUCAoAWdromEyBAgAABAYBzgAABAgQItFBAANDCTtdkAgQIECAgAHAOECBAgACBFgoIAFrY6ZpMgAABAgQEAM4BAgQIECDQQgEBQAs7XZMJECBAgIAAwDlAgAABAgRaKCAAaGGnazIBAgQIEBAAOAcIECBAgEALBQQALex0TSZAgAABAgIA5wABAgQIEGihgACghZ2uyQQIECBAQADgHCBAgAABAi0UEAC0sNM1mQABAgQICACcAwQIECBAoIUCAoAWdromEyBAgAABAYBzgAABAgQItFBAANDCTtdkAgQIECAgAHAOECBAgACBFgoIAFrY6ZpMgAABAgQEAM4BAgQIECDQQgEBQAs7XZMJECBAgIAAwDlAgAABAgRaKCAAaGGnazIBAgQIEBAAOAcIECBAgEALBQQALex0TSZAgAABAgIA5wABAgQIEGihgACghZ2uyQQIECBAQADgHCBAgAABAi0UEAC0sNM1mQABAgQIjCIgkIPAprs/NWy+17NzqKo6tlzggpfeOcz98EstV9D8HAQEADn0kjqGoc07wtDoGAkCG15gaHLbhq+jChJIAm4BOA8IECBAgEALBQQALex0TSZAgAABAgIA5wABAgQIEGihgACghZ2uyQQIECBAQADgHCBAgAABAi0UEAC0sNM1mQABAgQICACcAwQIECBAoIUCAoAWdromEyBAgAABAYBzgAABAgQItFBAANDCTtdkAgQIECAgAHAOECBAgACBFgoIAFrY6ZpMgAABAgQEAM4BAgQIECDQQgEBQAs7XZMJECBAgIAAwDlAgAABAgRaKCAAaGGnazIBAgQIEBAAOAcIECBAgEALBQQALex0TSZAgAABAgIA5wABAgQIEGihgACghZ2uyQQIECBAQADgHCBAgAABAi0UEAC0sNM1mQABAgQICACcAwQIECBAoIUCAoAWdromEyBAgAABAYBzgAABAgQItFBAANDCTtdkAgQIECAgAHAOECBAgACBFgoIAFrY6ZpMgAABAgQEAM4BAgQIECDQQgEBQAs7XZMJECBAgIAAwDlAgAABAgRaKCAAaGGnazIBAgQIEBAAOAcIECBAgEALBQQALex0TSZAgAABAgIA5wABAgQIEGihgACghZ2uyQQIECBAQADgHCBAgAABAi0UEAC0sNM1mQABAgQICACcAwQIECBAoIUCAoAWdromEyBAgAABAYBzgAABAgQItFBgtIVt1uQMBRbO/3WYjz+DnobGJsLw1iMHspkL5/8mLMb/Bj0t7j1v0JuofQMiMHTOidsG/1/kgHSWZgy+wPgN7hS2P/W9A9nQcx9xdFg8sHsg26ZRBHIUcAsgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15TZwIECBAg0FBAANAQUHECBAgQIJCjgAAgx15T54EVWJzaN5BtW5ydDosLcwPZNo0ikKvA0DknblvMtfLqTYAAAQIECPQm4ApAb25KESBAgACBrAUEAFl3n8oTIECAAIHeBAQAvbkpRYAAAQIEshYQAGTdfSpPgAABAgR6ExAA9OamFAECBAgQyFpAAJB196k8AQIECBDoTUAA0JubUgQIECBAIGsBAUDW3afyBAgQIECgNwEBQG9uShEgQIAAgawFBABZd5/KEyBAgACB3gQEAL25KUWAAAECBLIWEABk3X0qT4AAAQIEehMQAPTmphQBAgQIEMhaQACQdfepPAECBAgQ6E1AANCbm1IECBAgQCBrAQFA1t2n8gQIECBAoDcBAUBvbkoRIECAAIGsBQQAWXefyhMgQIAAgd4EBAC9uSlFgAABAgSyFhAAZN19Kk+AAAECBHoTEAD05qYUAQIECBDIWkAAkHX3qTwBAgQIEOhNQADQm5tSBAgQIEAgawEBQNbdp/IECBAgQKA3AQFAb25KESBAgACBrAUEAFl3n8oTIECAAIHeBAQA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">
+<meta name="apple-mobile-web-app-title" content="Commandes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<style>
+  :root { --fond:#f3f4f6; --carte:#fff; --texte:#111827; --gris:#6b7280; --bord:#e5e7eb;
+          --accent:#ea580c; --accent-clair:#fff7ed; --vert:#16a34a; --rouge:#dc2626; --rouge-clair:#fef2f2; --sombre:#1f2937; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+         background:var(--fond); color:var(--texte); font-size:16px; }
+  .haut-fixe { position:sticky; top:0; z-index:5; }
+  header { background:var(--sombre); color:#fff;
+           padding:12px 16px; padding-top:max(12px, env(safe-area-inset-top));
+           display:flex; align-items:center; gap:12px; }
+  header h1 { font-size:18px; margin:0; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  header button { background:rgba(255,255,255,.15); color:#fff; border:0; border-radius:8px; padding:8px 12px; font-size:15px; }
+  main { padding:16px; padding-bottom:110px; max-width:700px; margin:0 auto; }
+  .ecran { display:none; } .ecran.actif { display:block; }
+  label.champ { display:block; margin-bottom:14px; font-weight:600; font-size:14px; color:var(--gris); }
+  input, textarea { width:100%; font-size:17px; padding:12px; border:1px solid var(--bord);
+                    border-radius:10px; margin-top:6px; background:#fff; color:var(--texte); font-family:inherit; }
+  .grille-tables { display:grid; grid-template-columns:repeat(auto-fill,minmax(68px,1fr)); gap:10px; }
+  .grille-tables button { aspect-ratio:1; font-size:22px; font-weight:700; border:2px solid var(--bord);
+                          background:var(--carte); border-radius:12px; color:var(--texte); }
+  .grille-tables button:active { background:var(--accent); color:#fff; }
+  .onglets { display:flex; gap:8px; overflow-x:auto; padding:0 16px 10px; margin:0 -16px 6px; }
+  .onglets button { flex:none; padding:10px 16px; border-radius:999px; background:var(--carte);
+                    font-size:15px; font-weight:600; color:var(--texte); border:1px solid var(--bord); }
+  .onglets button.actif { background:var(--sombre); color:#fff; border-color:var(--sombre); }
+  .articles { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .article { position:relative; background:var(--carte); border:1px solid var(--bord); border-radius:12px;
+             padding:14px 12px; text-align:left; font-size:16px; font-weight:600; min-height:76px; color:var(--texte); }
+  .article small { display:block; font-weight:400; color:var(--gris); margin-top:4px; }
+  .article .badge { position:absolute; top:-6px; right:-6px; background:var(--accent); color:#fff;
+                    border-radius:999px; min-width:26px; height:26px; font-size:14px; display:flex;
+                    align-items:center; justify-content:center; padding:0 6px; }
+  .article .perso { position:absolute; bottom:8px; right:10px; font-size:12px; color:var(--gris); font-weight:400; }
+  .article:active { transform:scale(.97); }
+  .barre { position:fixed; left:0; right:0; bottom:0; background:var(--carte); border-top:1px solid var(--bord);
+           padding:12px 16px; padding-bottom:max(12px, env(safe-area-inset-bottom)); display:flex; gap:10px; z-index:5; }
+  .barre button, .gros { flex:1; font-size:17px; font-weight:700; padding:16px; border-radius:12px; border:0; }
+  .principal { background:var(--accent); color:#fff; }
+  .principal:disabled { opacity:.4; }
+  .secondaire { background:var(--fond); color:var(--texte); flex:0 0 auto !important; }
+  .danger { background:var(--rouge-clair); color:var(--rouge); flex:0 0 auto !important; }
+  .ligne { background:var(--carte); border:1px solid var(--bord); border-radius:12px; padding:12px; margin-bottom:10px; }
+  .ligne .haut { display:flex; align-items:center; gap:10px; }
+  .ligne .nom { flex:1; font-weight:600; }
+  .ligne .prix { color:var(--gris); font-size:14px; }
+  .det { font-size:14px; margin-top:3px; }
+  .det.opt { color:var(--sombre); } .det.ext { color:var(--vert); font-weight:600; }
+  .det.ret { color:var(--rouge); font-weight:600; } .det.com { color:var(--accent); font-style:italic; }
+  .qte { display:flex; align-items:center; gap:4px; }
+  .qte button { width:40px; height:40px; border-radius:10px; border:1px solid var(--bord); background:var(--fond);
+                font-size:22px; color:var(--texte); }
+  .qte span { min-width:28px; text-align:center; font-weight:700; font-size:18px; }
+  .lien { background:none; border:0; color:var(--gris); font-size:14px; padding:6px 0 0; text-decoration:underline; }
+  .vide { text-align:center; color:var(--gris); padding:40px 0; }
+  .titre { font-size:20px; font-weight:700; margin:4px 0 14px; }
+  .total { display:flex; justify-content:space-between; font-weight:700; font-size:18px; padding:6px 4px 16px; }
+  /* Fiche article */
+  .modale { position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:flex-end; z-index:20; }
+  .modale.actif { display:flex; }
+  .boite { background:var(--carte); width:100%; max-width:700px; margin:0 auto; border-radius:18px 18px 0 0;
+           max-height:92vh; display:flex; flex-direction:column; }
+  .boite .contenu { overflow-y:auto; padding:18px 16px 8px; }
+  .boite .pied { padding:12px 16px; padding-bottom:max(12px, env(safe-area-inset-bottom)); border-top:1px solid var(--bord);
+                 display:flex; gap:10px; align-items:center; }
+  .fiche-titre { display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+  .fiche-titre h2 { margin:0; font-size:22px; }
+  .section { margin-top:18px; }
+  .section h3 { font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--gris); margin:0 0 8px; }
+  .puces { display:flex; flex-wrap:wrap; gap:8px; }
+  .puce { padding:11px 14px; border-radius:999px; border:1.5px solid var(--bord); background:var(--carte);
+          font-size:15px; color:var(--texte); font-weight:500; }
+  .puce.on { border-color:var(--accent); background:var(--accent-clair); color:var(--accent); font-weight:700; }
+  .puce.retire.on { border-color:var(--rouge); background:var(--rouge-clair); color:var(--rouge); text-decoration:line-through; }
+  .raccourcis { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .raccourcis button { padding:7px 10px; border-radius:8px; border:1px dashed var(--bord); background:var(--fond); font-size:13px; color:var(--texte); }
+  .etats { display:flex; gap:6px; padding:8px 16px; background:var(--sombre);
+           overflow-x:auto; border-top:1px solid rgba(255,255,255,.08); }
+  .etat { flex:none; display:flex; align-items:center; gap:6px; padding:5px 10px; border-radius:999px; border:0;
+          background:rgba(255,255,255,.1); color:#fff; font-size:13px; font-weight:600; }
+  .pt { width:9px; height:9px; border-radius:50%; background:#9ca3af; }
+  .pt.ok { background:#22c55e; } .pt.attention { background:#f59e0b; } .pt.alerte, .pt.hors_ligne, .pt.ko { background:#ef4444; }
+  .pt.test { background:#60a5fa; }
+  .bandeau { display:none; background:var(--rouge); color:#fff; padding:10px 16px; font-weight:600; font-size:14px; text-align:center; }
+  .bandeau.actif { display:block; }
+  .detail-etat { display:flex; gap:12px; align-items:flex-start; padding:12px 0; border-bottom:1px solid var(--bord); }
+  .detail-etat .pt { margin-top:6px; width:12px; height:12px; flex:none; }
+  .detail-etat small { color:var(--gris); }
+  .imp-ok { color:var(--vert); font-weight:600; } .imp-ko { color:var(--rouge); font-weight:600; }
+  .toast.attention { background:#d97706; }
+  .code input { font-size:32px; letter-spacing:.4em; text-align:center; }
+  .toast { position:fixed; left:16px; right:16px; top:20px; padding:16px; border-radius:12px; color:#fff;
+           font-weight:600; z-index:30; display:none; text-align:center; font-size:16px; }
+  .toast.ok { background:var(--vert); } .toast.ko { background:var(--rouge); }
+  .hist { display:flex; align-items:center; gap:10px; }
+  .hist div { flex:1; } .hist small { color:var(--gris); }
+  .hist button { padding:10px 12px; border-radius:10px; border:1px solid var(--bord); background:var(--fond); font-size:14px; color:var(--texte); }
+</style>
+</head>
+<body>
+
+<div class="haut-fixe">
+<header>
+  <button id="btnRetour" style="display:none">‹ Retour</button>
+  <h1 id="titre">Prise de commande</h1>
+  <button id="btnHistorique">Envoyées</button>
+  <button id="btnReglages" aria-label="Réglages">⚙︎</button>
+</header>
+<div class="etats" id="etats"><button class="etat" data-detail="1"><span class="pt"></span>Wi-Fi</button></div>
+<div class="bandeau" id="bandeau"></div>
+</div>
+
+<main>
+  <section class="ecran actif" id="ecranTables">
+    <label class="champ">Votre prénom
+      <input id="serveur" placeholder="ex : Karim" autocomplete="off">
+    </label>
+    <div class="titre">Choisir la table</div>
+    <div class="grille-tables" id="grilleTables"></div>
+    <label class="champ" style="margin-top:16px">Autre (terrasse, emporter…)
+      <input id="tableLibre" placeholder="ex : T5, EMP" autocomplete="off">
+    </label>
+  </section>
+
+  <section class="ecran" id="ecranMenu">
+    <div class="onglets" id="onglets"></div>
+    <div class="articles" id="articles"></div>
+  </section>
+
+  <section class="ecran" id="ecranPanier">
+    <div class="ligne haut" style="display:flex;align-items:center">
+      <span class="nom" style="flex:1;font-weight:600">Couverts</span>
+      <div class="qte" id="zoneCouverts"><button data-c="-1">−</button><span id="couverts">0</span><button data-c="1">+</button></div>
+    </div>
+    <div id="lignesPanier"></div>
+    <label class="champ">Note générale pour la table (allergie, ordre d'envoi…)
+      <textarea id="noteGlobale" rows="2"></textarea>
+    </label>
+  </section>
+
+  <section class="ecran" id="ecranHistorique">
+    <div class="titre">Commandes envoyées aujourd'hui</div>
+    <div id="listeHistorique"></div>
+  </section>
+</main>
+
+<div class="barre" id="barre"></div>
+<div class="modale" id="modale"><div class="boite" id="boite"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const RACCOURCIS = ["Sauce à part", "Bien cuit", "Peu cuit", "Allergie", "Sans gluten si possible", "À partager", "Pour enfant", "Servir en premier"];
+let menu = null, table = null, panier = [], couverts = 0, catActive = 0, ecran = "ecranTables", envoi = false;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const euros = n => n.toFixed(2).replace(".", ",") + " €";
+const stock = { lire: k => { try { return localStorage.getItem(k) || ""; } catch (e) { return ""; } },
+                ecrire: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
+
+class CodeRequis extends Error {}
+/* ===== Version autonome : tout tourne sur l'appareil, impression directe Epson ePOS-Print ===== */
+const MENU = {"groupes": {"extras_sale": {"titre": "Extras", "type": "multiple", "valeurs": [{"nom": "Œuf poché", "prix": 2}, {"nom": "Œufs brouillés", "prix": 4}, {"nom": "Avocat", "prix": 3}, {"nom": "Halloumi", "prix": 3}, {"nom": "Saumon fumé", "prix": 4}, {"nom": "Bacon", "prix": 3}]}, "temperature": {"titre": "Chaud ou glacé", "type": "unique", "defaut": "Chaud", "valeurs": [{"nom": "Chaud"}, {"nom": "Glacé"}]}, "lait": {"titre": "Lait", "type": "unique", "defaut": "Lait de vache", "valeurs": [{"nom": "Lait de vache"}, {"nom": "Avoine"}, {"nom": "Coco"}, {"nom": "Amande"}]}}, "categories": [{"nom": "Plats salés", "imprimante": "cuisine", "groupes": ["extras_sale"], "articles": [{"nom": "Vert Crémeux", "prix": 15, "ingredients": ["Guacamole", "Œufs pochés", "Sésame noir", "Piment doux", "Petite salade"]}, {"nom": "Nordique Chill", "prix": 17, "ingredients": ["Saumon fumé", "Avocat", "Œufs pochés", "Crème à l'aneth", "Citron", "Petite salade"]}, {"nom": "Smoky Benny", "prix": 18, "ingredients": ["Saumon fumé", "Œufs pochés", "Câpres", "Sauce hollandaise", "Petite salade"]}, {"nom": "Benedict Waffle", "prix": 17, "ingredients": ["Œufs pochés", "Bacon", "Avocat", "Sauce hollandaise", "Petite salade"]}, {"nom": "Méditerranéen Sun", "prix": 15, "ingredients": ["Feta", "Avocat", "Tomates cerises", "Zaatar", "Petite salade"]}, {"nom": "Rouge Soleil", "prix": 17, "ingredients": ["Œufs pochés", "Poivrons confits", "Épices", "Petite salade"]}, {"nom": "Benny Original", "prix": 17, "ingredients": ["Bacon", "Œufs pochés", "Sauce hollandaise", "Petite salade"]}, {"nom": "Triomfé Signature", "prix": 18, "ingredients": ["Halloumi", "Bacon", "Œufs brouillés", "Avocat", "Tomates cerises", "Petite salade"]}]}, {"nom": "Plats sucrés", "imprimante": "cuisine", "articles": [{"nom": "Maple Mood", "prix": 13, "ingredients": ["Sirop d'érable", "Fruits frais"]}, {"nom": "Pinky Stack", "prix": 14, "ingredients": ["Fruits rouges", "Chantilly"]}, {"nom": "Banoffee Love", "prix": 14, "ingredients": ["Banane", "Caramel", "Éclats de pralin"]}, {"nom": "Sweet Brioche", "prix": 14, "ingredients": ["Banane", "Caramel beurre salé", "Noix"]}, {"nom": "Nutella Bliss", "prix": 14, "ingredients": ["Nutella", "Éclats de noisettes"]}, {"nom": "Spéculoos Crunch", "prix": 15, "ingredients": ["Chantilly", "Éclats croquants"]}, {"nom": "Gaufre Pistachio Bloom", "prix": 15, "ingredients": ["Crème pistache", "Éclats de pistaches"]}, {"nom": "Gaufre Nutella", "prix": 14, "ingredients": ["Nutella", "Kinder"]}]}, {"nom": "Salades & Bowls", "imprimante": "cuisine", "groupes": ["extras_sale"], "articles": [{"nom": "César Croquant", "prix": 14, "ingredients": ["Poulet", "Parmesan", "Œuf mollet", "Croûtons", "Sauce César"]}, {"nom": "Salade Gourmande", "prix": 12, "ingredients": ["Avocat", "Tomates cerises", "Comté", "Noix", "Vinaigrette"]}, {"nom": "Salade Nordique", "prix": 16, "ingredients": ["Saumon gravlax", "Avocat", "Radis", "Roquette", "Sésame", "Vinaigrette"]}, {"nom": "Poke Bowl", "prix": 17, "ingredients": ["Saumon gravlax", "Avocat", "Edamame", "Concombre", "Radis", "Sésame", "Sauce soja"]}, {"nom": "Buddha Bowl Veggie", "prix": 13, "ingredients": ["Pois chiches", "Avocat", "Crudités", "Sauce tahini"]}, {"nom": "Granola Bowl", "prix": 13, "groupes": [], "ingredients": ["Granola", "Yaourt", "Miel", "Fruits frais"]}, {"nom": "Chia Pudding", "prix": 13, "groupes": [], "ingredients": ["Granola", "Fruits rouges", "Miel"]}, {"nom": "Açaí Bowl", "prix": 12, "groupes": [], "ingredients": ["Granola", "Banane", "Fruits rouges", "Noix de coco"]}]}, {"nom": "Sandwichs & Bagels", "imprimante": "cuisine", "groupes": ["extras_sale"], "articles": [{"nom": "Parisien Fermier", "prix": 9, "ingredients": ["Beurre", "Cornichons"]}, {"nom": "Nordique", "prix": 11, "ingredients": ["Cream cheese", "Concombre", "Aneth"]}, {"nom": "Poulet César", "prix": 11, "ingredients": ["Salade romaine", "Parmesan", "Sauce César"]}, {"nom": "Méditerranéen", "prix": 10, "ingredients": ["Houmous", "Aubergines", "Feta", "Tomates confites"]}, {"nom": "Club Maison", "prix": 10, "ingredients": ["Œuf dur", "Tomate", "Concombre", "Olives", "Oignon rouge", "Sauce citronnée"]}, {"nom": "Pastrami Deli", "prix": 14, "ingredients": ["Cheddar", "Pickles", "Moutarde", "Salade"]}, {"nom": "Bagel New Yorker", "prix": 10, "ingredients": ["Cream cheese", "Concombre", "Oignons rouges"]}, {"nom": "Bagel Honey Chicken", "prix": 10, "ingredients": ["Cheddar", "Salade", "Sauce miel-moutarde"]}]}, {"nom": "Douceurs", "imprimante": "bar", "articles": [{"nom": "Croissant", "prix": 3.5}, {"nom": "Pain au chocolat", "prix": 3.5}, {"nom": "Cookie du moment", "prix": 4.5}, {"nom": "Cake marbré", "prix": 4.5}, {"nom": "Cheesecake", "prix": 5.5}, {"nom": "Banana bread", "prix": 5.5}, {"nom": "Carrot cake", "prix": 5.5}, {"nom": "Moelleux au chocolat", "prix": 5.5}, {"nom": "Brownie", "prix": 5.5}]}, {"nom": "Daily Shots", "imprimante": "bar", "groupes": ["temperature", "lait"], "articles": [{"nom": "Espresso", "prix": 2.8, "groupes": []}, {"nom": "Double espresso", "prix": 3.8, "groupes": []}, {"nom": "Americano", "prix": 3.5, "groupes": ["temperature"]}, {"nom": "Macchiato", "prix": 4}, {"nom": "Cappuccino", "prix": 5.5}, {"nom": "Latte", "prix": 5.5}, {"nom": "Flat White", "prix": 6}, {"nom": "Chocolat chaud", "prix": 5}, {"nom": "Matcha Latte", "prix": 6}, {"nom": "Chaï Latte", "prix": 6}, {"nom": "Thé / Infusion bio", "prix": 5, "groupes": ["temperature"]}, {"nom": "Soft drink", "prix": 3.5, "groupes": []}]}, {"nom": "Créations", "imprimante": "bar", "groupes": ["temperature", "lait"], "articles": [{"nom": "Ube Dream", "prix": 8}, {"nom": "Cookie Mocha", "prix": 8}, {"nom": "Pistachio Matcha", "prix": 8}, {"nom": "Lavender Vanilla", "prix": 8}, {"nom": "Pumpkin Spice Latte", "prix": 8}, {"nom": "Mango Matcha", "prix": 8}]}, {"nom": "Jus pressés", "imprimante": "bar", "articles": [{"nom": "Aube", "prix": 8}, {"nom": "Rubis", "prix": 8}, {"nom": "Verda", "prix": 8}, {"nom": "Matcha Glow", "prix": 8}, {"nom": "Tropical Vibes", "prix": 8}, {"nom": "Jus d'orange", "prix": 5}, {"nom": "Citronnade", "prix": 5}]}]};
+const RESTO = "Triomfé", NB_TABLES = 30;
+const NOMS_IMP = { cuisine: "Cuisine", bar: "Bar" };
+const REGLAGES_DEFAUT = { cuisine: "192.168.192.50", bar: "192.168.192.50",
+  protocole: location.protocol === "http:" ? "http" : "https", devid: "local_printer" };
+function reglages() {
+  try { return Object.assign({}, REGLAGES_DEFAUT, JSON.parse(stock.lire("reglages") || "{}")); }
+  catch (e) { return Object.assign({}, REGLAGES_DEFAUT); }
+}
+const p2 = n => String(n).padStart(2, "0");
+const jour = () => { const d = new Date(); return d.getFullYear() + "-" + p2(d.getMonth() + 1) + "-" + p2(d.getDate()); };
+const horodatage = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 19);
+function historique() { try { return JSON.parse(stock.lire("historique") || "[]"); } catch (e) { return []; } }
+function sauverHistorique(h) {
+  const limite = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
+  stock.ecrire("historique", JSON.stringify(h.filter(c => c.date.slice(0, 10) >= limite)));
+}
+
+/* --- ePOS-Print --- */
+const xesc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&apos;"}[c]));
+const L = (s, attrs) => `<text${attrs || ""}>${xesc(s)}&#10;</text>`;
+const TRAIT = "-".repeat(42);
+function ticketXML(cmd, nomImp, articles, reimp) {
+  let x = '<text lang="en" smooth="true"/><text align="center"/>';
+  if (reimp) x += '<text em="true"/>' + L("*** REIMPRESSION ***") + '<text em="false"/>';
+  x += L(nomImp.toUpperCase());
+  x += '<text dw="true" dh="true"/>' + L("TABLE " + cmd.table) + '<text dw="false" dh="false"/>';
+  x += L("Cmd n°" + cmd.numero + "  -  " + cmd.date.slice(8, 10) + "/" + cmd.date.slice(5, 7) + " " + cmd.date.slice(11, 16));
+  x += L("Serveur : " + (cmd.serveur || "-") + (cmd.couverts ? "   Couverts : " + cmd.couverts : ""));
+  x += '<text align="left"/>' + L(TRAIT);
+  let cat = null;
+  articles.forEach(a => {
+    if (a.categorie !== cat) { cat = a.categorie; x += '<text em="true"/>' + L("[" + cat.toUpperCase() + "]") + '<text em="false"/>'; }
+    x += '<text dh="true"/>' + L((a.quantite < 10 ? " " : "") + a.quantite + " x " + a.nom) + '<text dh="false"/>';
+    if (a.options.length) x += '<text em="true"/>' + L("     > " + a.options.join(" / ")) + '<text em="false"/>';
+    a.extras.forEach(e => { x += '<text em="true"/>' + L("     + " + e) + '<text em="false"/>'; });
+    a.retraits.forEach(r => { x += '<text em="true"/>' + L("     SANS " + r.toUpperCase()) + '<text em="false"/>'; });
+    if (a.note) x += L("     ! " + a.note);
+  });
+  if (cmd.note) x += L(TRAIT) + '<text em="true"/><text>NOTE : </text><text em="false"/>' + L(cmd.note);
+  x += L(TRAIT) + '<feed line="3"/><cut type="feed"/>';
+  return x;
+}
+async function epos(ip, corps, delai) {
+  const r = reglages(); delai = delai || 10000;
+  const url = `${r.protocole}://${ip}/cgi-bin/epos/service.cgi?devid=${encodeURIComponent(r.devid)}&timeout=${delai}`;
+  const xml = '<?xml version="1.0" encoding="utf-8"?><s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"><s:Body>' +
+    '<epos-print xmlns="http://www.epson-pos.com/schemas/2011/03/epos-print">' + corps + '</epos-print></s:Body></s:Envelope>';
+  const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), delai + 4000);
+  try {
+    const rep = await fetch(url, { method: "POST", body: xml, signal: ctrl.signal, cache: "no-store",
+      headers: { "Content-Type": "text/xml; charset=utf-8", "If-Modified-Since": "Thu, 01 Jan 1970 00:00:00 GMT", "SOAPAction": '""' } });
+    const doc = new DOMParser().parseFromString(await rep.text(), "text/xml");
+    const el = doc.getElementsByTagNameNS("*", "response")[0] || doc.getElementsByTagName("response")[0];
+    if (!el) throw new Error("réponse illisible");
+    return { succes: el.getAttribute("success") === "true", code: el.getAttribute("code") || "", statut: +el.getAttribute("status") || 0 };
+  } finally { clearTimeout(t); }
+}
+function lireStatut(s, code) {
+  const c = { EPTR_COVER_OPEN: "Capot ouvert", EPTR_REC_EMPTY: "Plus de papier !", EPTR_MECHANICAL: "Erreur mécanique",
+    EPTR_AUTOCUTTER: "Erreur massicot", EPTR_UNRECOVERABLE: "Erreur imprimante", DeviceNotFound: "Nom d'imprimante (devid) incorrect",
+    EX_TIMEOUT: "Imprimante occupée ou hors ligne", SchemaError: "Ticket invalide", PrintSystemError: "Erreur système imprimante" }[code];
+  if (s & 0x20) return { etat: "alerte", message: "Capot ouvert" };
+  if (s & 0x80000) return { etat: "alerte", message: "Plus de papier !" };
+  if (s & (0x400 | 0x800 | 0x2000 | 0x4000)) return { etat: "alerte", message: "Erreur imprimante" };
+  if (c) return { etat: "alerte", message: c };
+  if (s & 0x20000) return { etat: "attention", message: "Papier bientôt fini" };
+  return { etat: "ok", message: "Connectée" };
+}
+const MSG_INJOIGNABLE = "Injoignable : appareil sur le Wi-Fi L'Addition ? certificat accepté ? (voir ⚙︎)";
+
+let cacheEtat = { t: 0, v: null };
+async function etatImprimantes(force) {
+  if (!force && cacheEtat.v && Date.now() - cacheEtat.t < 10000) return cacheEtat.v;
+  const r = reglages(), deja = {}, res = [];
+  for (const cle of Object.keys(NOMS_IMP)) {
+    const ip = (r[cle] || "").trim(); let e;
+    if (!ip) e = { etat: "test", message: "Mode test (pas d'IP)" };
+    else if (deja[ip]) e = deja[ip];
+    else {
+      try { const x = await epos(ip, "", 3000); e = lireStatut(x.statut, x.succes ? "" : x.code); }
+      catch (err) { e = { etat: "hors_ligne", message: MSG_INJOIGNABLE }; }
+      deja[ip] = e;
+    }
+    res.push(Object.assign({}, e, { cle, nom: NOMS_IMP[cle], ip }));
+  }
+  cacheEtat = { t: Date.now(), v: res };
+  return res;
+}
+async function imprimerCommande(cmd, reimp) {
+  const r = reglages(), groupes = {}, rapport = [];
+  cmd.articles.forEach(a => (groupes[a.imprimante] = groupes[a.imprimante] || []).push(a));
+  for (const cle of Object.keys(groupes)) {
+    const nom = NOMS_IMP[cle] || cle, ip = (r[cle] || "").trim();
+    if (!ip) { rapport.push({ imprimante: nom, ok: true, test: true }); continue; }
+    try {
+      const x = await epos(ip, ticketXML(cmd, nom, groupes[cle], reimp), 15000);
+      const s = lireStatut(x.statut, x.succes ? "" : x.code);
+      if (!x.succes) rapport.push({ imprimante: nom, ok: false, erreur: nom + " : " + s.message });
+      else rapport.push(Object.assign({ imprimante: nom, ok: true }, s.etat === "attention" ? { alerte: nom + " : " + s.message } : {}));
+    } catch (err) {
+      rapport.push({ imprimante: nom, ok: false, erreur: "Imprimante " + nom + " injoignable" });
+    }
+  }
+  cacheEtat.v = null;
+  return rapport;
+}
+
+async function api(chemin, corps) {
+  if (chemin === "/api/menu") return { restaurant: RESTO, nombre_tables: NB_TABLES, groupes: MENU.groupes, categories: MENU.categories };
+  if (chemin.startsWith("/api/etat")) return { imprimantes: await etatImprimantes(chemin.includes("force")), heure: new Date().toLocaleTimeString("fr-FR") };
+  if (chemin === "/api/commandes") return historique().filter(c => c.date.startsWith(jour())).reverse().slice(0, 50);
+  if (chemin === "/api/commande") {
+    const h = historique(), nums = h.filter(c => c.date.startsWith(jour())).map(c => c.numero);
+    const cmd = { numero: nums.length ? Math.max(...nums) + 1 : 1, date: horodatage(), table: String(corps.table).slice(0, 10),
+      serveur: corps.serveur || "", couverts: corps.couverts, note: corps.note || "", articles: corps.articles };
+    h.push(cmd); sauverHistorique(h);
+    cmd.impression = await imprimerCommande(cmd);
+    sauverHistorique(historique().map(c => c.numero === cmd.numero && c.date === cmd.date ? cmd : c));
+    return { numero: cmd.numero, impression: cmd.impression };
+  }
+  if (chemin === "/api/reimprimer") {
+    const c = historique().find(c => c.numero === corps.numero && c.date.startsWith(jour()));
+    if (!c) throw new Error("Commande introuvable");
+    return { impression: await imprimerCommande(c, true) };
+  }
+  throw new Error("Inconnu");
+}
+
+/* --- Réglages --- */
+function ouvrirReglages() {
+  const r = reglages(); fiche = null;
+  const lienCert = ip => ip ? `<a href="https://${esc(ip)}" target="_blank" rel="noopener" style="color:var(--accent)">Ouvrir https://${esc(ip)}</a>` : "";
+  $("boite").innerHTML = `<div class="contenu"><div class="titre">Réglages imprimantes</div>
+    <label class="champ">IP imprimante Cuisine (vide = mode test)<input id="rCuisine" value="${esc(r.cuisine)}" inputmode="decimal"></label>
+    <label class="champ">IP imprimante Bar<input id="rBar" value="${esc(r.bar)}" inputmode="decimal"></label>
+    <label class="champ">Nom d'appareil (devid)<input id="rDevid" value="${esc(r.devid)}"></label>
+    <p style="font-size:14px;color:var(--gris)">Connexion : <b>${esc(r.protocole.toUpperCase())}</b>.
+    Première fois sur cet appareil : ${lienCert(r.cuisine)} dans Safari, touchez « Afficher les détails » → « visiter ce site web » pour accepter le certificat de l'imprimante, puis revenez ici.</p>
+    ${r.bar && r.bar !== r.cuisine ? `<p style="font-size:14px">${lienCert(r.bar)}</p>` : ""}</div>
+    <div class="pied"><button class="gros secondaire" id="rTest" style="flex:1 !important">Ticket test</button>
+    <button class="gros principal" id="rOk">Enregistrer</button></div>`;
+  $("modale").classList.add("actif");
+  const lire = () => ({ cuisine: $("rCuisine").value.trim(), bar: $("rBar").value.trim(), devid: $("rDevid").value.trim() || "local_printer", protocole: r.protocole });
+  $("rOk").onclick = () => { stock.ecrire("reglages", JSON.stringify(lire())); cacheEtat.v = null; $("modale").classList.remove("actif"); verifierEtat(true); };
+  $("rTest").onclick = async () => {
+    stock.ecrire("reglages", JSON.stringify(lire())); cacheEtat.v = null;
+    $("rTest").textContent = "Envoi…";
+    const cmd = { numero: 0, date: horodatage(), table: "TEST", serveur: $("serveur").value.trim(), note: "Ticket de test",
+      articles: [{ nom: "Test impression", categorie: "Test", imprimante: "cuisine", quantite: 1, options: [], extras: [], retraits: ["oignons"], note: "accents : éèàç €" }] };
+    const rap = await imprimerCommande(cmd);
+    $("rTest").textContent = "Ticket test";
+    toast(rap[0].ok ? (rap[0].test ? "Mode test : pas d'IP" : "✓ Ticket test imprimé") : rap[0].erreur, rap[0].ok);
+  };
+}
+$("btnReglages").onclick = ouvrirReglages;
+
+function demanderCode(erreur) {
+  if ($("modale").classList.contains("actif") && $("codeAcces")) return;
+  fiche = null;
+  $("boite").innerHTML = `<div class="contenu code"><div class="titre">Code d'accès</div>
+    <p style="color:var(--gris);margin-top:0">Demandez le code au responsable. Il n'est demandé qu'une fois sur ce téléphone.</p>
+    ${erreur ? `<p class="imp-ko">${esc(erreur)}</p>` : ""}
+    <input id="codeAcces" type="password" inputmode="numeric" autocomplete="off" maxlength="12"></div>
+    <div class="pied"><button class="gros principal" id="bCode">Valider</button></div>`;
+  $("modale").classList.add("actif");
+  setTimeout(() => $("codeAcces") && $("codeAcces").focus(), 100);
+  $("bCode").onclick = async () => {
+    stock.ecrire("code", $("codeAcces").value.trim());
+    $("modale").classList.remove("actif");
+    try { await demarrer(); } catch (e) { if (!(e instanceof CodeRequis)) toast(e.message, false); }
+  };
+}
+
+$("serveur").value = stock.lire("serveur");
+$("serveur").addEventListener("input", e => stock.ecrire("serveur", e.target.value));
+
+function toast(msg, ok, classe) {
+  const t = $("toast"); t.textContent = msg; t.className = "toast " + (classe || (ok ? "ok" : "ko")); t.style.display = "block";
+  clearTimeout(t._t); t._t = setTimeout(() => t.style.display = "none", ok ? 2500 : 8000);
+}
+$("toast").onclick = () => $("toast").style.display = "none";
+
+/* ---------- Etat Wi-Fi / imprimantes ---------- */
+let etat = { wifi: null, imprimantes: [], heure: "" };
+async function verifierEtat(force) {
+  try {
+    const r = await api("/api/etat" + (force ? "?force=1" : ""));
+    etat = { wifi: true, imprimantes: r.imprimantes, heure: r.heure };
+  } catch (e) {
+    if (e instanceof CodeRequis) return;
+    etat.wifi = false;
+  }
+  rendreEtat();
+}
+function rendreEtat() {
+  const wifiOk = etat.wifi && navigator.onLine !== false;
+  $("etats").innerHTML = `<button class="etat" data-detail="1"><span class="pt ${etat.wifi === null ? "" : wifiOk ? "ok" : "ko"}"></span>Wi-Fi</button>` +
+    (wifiOk ? etat.imprimantes : []).map(i => `<button class="etat" data-detail="1"><span class="pt ${i.etat}"></span>${esc(i.nom)}</button>`).join("");
+  const pb = !wifiOk && etat.wifi !== null ? "Pas de réseau : vérifiez que l'appareil est sur le Wi-Fi L'Addition."
+    : (etat.imprimantes.filter(i => ["alerte", "hors_ligne"].includes(i.etat)).map(i => i.nom + " : " + i.message).join(" · "));
+  $("bandeau").textContent = pb; $("bandeau").classList.toggle("actif", !!pb);
+}
+function detailEtat() {
+  const wifiOk = etat.wifi && navigator.onLine !== false;
+  fiche = null;
+  $("boite").innerHTML = `<div class="contenu"><div class="titre">État du système</div>
+    <div class="detail-etat"><span class="pt ${wifiOk ? "ok" : "ko"}"></span><div><b>Wi-Fi</b><br>
+      <small>${wifiOk ? "Appareil en ligne" : "Hors ligne : rejoignez le Wi-Fi du restaurant"}</small></div></div>
+    ${etat.imprimantes.map(i => `<div class="detail-etat"><span class="pt ${i.etat}"></span><div><b>Imprimante ${esc(i.nom)}</b><br>
+      <small>${esc(i.message)}${i.ip ? " · " + esc(i.ip) : ""}</small></div></div>`).join("")}
+    <p style="color:var(--gris);font-size:13px">Dernière vérification : ${esc(etat.heure || "-")}</p></div>
+    <div class="pied"><button class="gros secondaire" id="bFermerEtat" style="flex:1 !important">Fermer</button>
+    <button class="gros principal" id="bVerifier">Vérifier maintenant</button></div>`;
+  $("modale").classList.add("actif");
+  $("bFermerEtat").onclick = () => $("modale").classList.remove("actif");
+  $("bVerifier").onclick = async () => { $("bVerifier").textContent = "Vérification…"; await verifierEtat(true); detailEtat(); };
+}
+$("etats").onclick = e => { if (e.target.closest("[data-detail]")) detailEtat(); };
+window.addEventListener("online", () => verifierEtat());
+window.addEventListener("offline", () => { etat.wifi = false; rendreEtat(); });
+document.addEventListener("visibilitychange", () => { if (!document.hidden) verifierEtat(); });
+setInterval(() => { if (!document.hidden) verifierEtat(); }, 15000);
+
+/* ---------- Navigation ---------- */
+function afficher(id) {
+  ecran = id;
+  document.querySelectorAll(".ecran").forEach(e => e.classList.toggle("actif", e.id === id));
+  $("btnRetour").style.display = id === "ecranTables" ? "none" : "";
+  $("btnHistorique").style.display = id === "ecranHistorique" ? "none" : "";
+  $("titre").textContent = { ecranTables: menu ? menu.restaurant : "Prise de commande",
+    ecranMenu: "Table " + table, ecranPanier: "Table " + table + " – Récap", ecranHistorique: "Historique" }[id];
+  if (id === "ecranMenu") rendreMenu();
+  if (id === "ecranPanier") rendrePanier();
+  if (id === "ecranHistorique") chargerHistorique();
+  rendreBarre(); window.scrollTo(0, 0);
+}
+$("btnRetour").onclick = () => {
+  if (ecran === "ecranPanier") afficher("ecranMenu");
+  else if (ecran === "ecranHistorique") afficher(table ? "ecranMenu" : "ecranTables");
+  else if (ecran === "ecranMenu") {
+    if (panier.length && !confirm("Abandonner la commande en cours ?")) return;
+    reinitialiser(); afficher("ecranTables");
+  }
+};
+$("btnHistorique").onclick = () => afficher("ecranHistorique");
+function reinitialiser() { panier = []; couverts = 0; table = null; $("noteGlobale").value = ""; }
+
+const nbArticles = () => panier.reduce((s, l) => s + l.quantite, 0);
+const total = () => panier.reduce((s, l) => s + prixUnitaire(l) * l.quantite, 0);
+
+function rendreBarre() {
+  const b = $("barre");
+  if (ecran === "ecranTables") {
+    b.innerHTML = `<button class="principal" id="bTableLibre">Valider la table</button>`;
+    b.style.display = $("tableLibre").value.trim() ? "flex" : "none";
+    $("bTableLibre").onclick = () => choisirTable($("tableLibre").value.trim());
+  } else if (ecran === "ecranMenu") {
+    b.style.display = "flex";
+    b.innerHTML = `<button class="principal" ${panier.length ? "" : "disabled"} id="bVoir">Voir la commande (${nbArticles()}) · ${euros(total())}</button>`;
+    $("bVoir").onclick = () => afficher("ecranPanier");
+  } else if (ecran === "ecranPanier") {
+    b.style.display = "flex";
+    b.innerHTML = `<button class="secondaire" id="bAjout">+ Ajouter</button>
+      <button class="principal" id="bEnvoyer" ${panier.length && !envoi ? "" : "disabled"}>${envoi ? "Envoi…" : "Envoyer"}</button>`;
+    $("bAjout").onclick = () => afficher("ecranMenu");
+    $("bEnvoyer").onclick = envoyer;
+  } else b.style.display = "none";
+}
+$("tableLibre").addEventListener("input", rendreBarre);
+function choisirTable(t) { if (!t) return; table = t; $("tableLibre").value = ""; catActive = 0; afficher("ecranMenu"); }
+
+function rendreTables() {
+  let h = ""; for (let i = 1; i <= menu.nombre_tables; i++) h += `<button data-t="${i}">${i}</button>`;
+  $("grilleTables").innerHTML = h;
+  $("grilleTables").onclick = e => { const t = e.target.dataset.t; if (t) choisirTable(t); };
+}
+
+/* ---------- Carte ---------- */
+function groupesDe(cat, a) {
+  return (a.groupes || cat.groupes || []).map(k => Object.assign({ cle: k }, menu.groupes[k])).filter(g => g.valeurs);
+}
+const personnalisable = (cat, a) => groupesDe(cat, a).length || (a.ingredients || []).length;
+
+function rendreMenu() {
+  $("onglets").innerHTML = menu.categories.map((c, i) =>
+    `<button class="${i === catActive ? "actif" : ""}" data-i="${i}">${esc(c.nom)}</button>`).join("");
+  const cat = menu.categories[catActive];
+  $("articles").innerHTML = cat.articles.map((a, i) => {
+    const n = panier.filter(l => l.nom === a.nom).reduce((s, l) => s + l.quantite, 0);
+    return `<button class="article" data-i="${i}">${esc(a.nom)}
+      ${a.prix ? `<small>${euros(a.prix)}</small>` : ""}
+      ${personnalisable(cat, a) ? `<span class="perso">⚙︎</span>` : ""}
+      ${n ? `<span class="badge">${n}</span>` : ""}</button>`;
+  }).join("");
+}
+$("onglets").onclick = e => { if (e.target.dataset.i) { catActive = +e.target.dataset.i; rendreMenu(); } };
+$("articles").onclick = e => {
+  const btn = e.target.closest(".article"); if (!btn) return;
+  const cat = menu.categories[catActive], a = cat.articles[+btn.dataset.i];
+  if (personnalisable(cat, a)) ouvrirFiche(cat, a, null);
+  else { ajouterLigne(nouvelleLigne(cat, a)); }
+};
+
+/* ---------- Lignes de commande ---------- */
+function nouvelleLigne(cat, a) {
+  const choix = {};
+  groupesDe(cat, a).forEach(g => { choix[g.cle] = g.type === "unique" && g.defaut ? [g.defaut] : []; });
+  return { nom: a.nom, prixBase: a.prix || 0, categorie: cat.nom, imprimante: cat.imprimante || "cuisine",
+           quantite: 1, choix, retraits: [], note: "", _cat: cat, _art: a };
+}
+function prixUnitaire(l) {
+  let p = l.prixBase;
+  groupesDe(l._cat, l._art).forEach(g => (l.choix[g.cle] || []).forEach(n => {
+    const v = g.valeurs.find(v => v.nom === n); if (v && v.prix) p += v.prix;
+  }));
+  return p;
+}
+function resumer(l) {
+  const options = [], extras = [];
+  groupesDe(l._cat, l._art).forEach(g => (l.choix[g.cle] || []).forEach(n => {
+    const v = g.valeurs.find(v => v.nom === n) || { nom: n };
+    if (g.type === "multiple") extras.push(v.nom + (v.prix ? " (+" + v.prix + "€)" : ""));
+    else options.push(v.nom);
+  }));
+  return { options, extras };
+}
+const signature = l => JSON.stringify([l.nom, l.choix, l.retraits.slice().sort(), l.note]);
+function ajouterLigne(l) {
+  const ex = panier.find(x => signature(x) === signature(l));
+  if (ex) ex.quantite += l.quantite; else panier.push(l);
+  if (navigator.vibrate) navigator.vibrate(15);
+  rendreMenu(); rendreBarre();
+}
+
+/* ---------- Fiche article ---------- */
+let fiche = null; // { ligne, index (null = nouvelle) }
+function ouvrirFiche(cat, a, index) {
+  const ligne = index === null ? nouvelleLigne(cat, a) : JSON.parse(JSON.stringify(panier[index], (k, v) => k[0] === "_" ? undefined : v));
+  if (index !== null) { ligne._cat = panier[index]._cat; ligne._art = panier[index]._art; }
+  fiche = { ligne, index };
+  rendreFiche();
+  $("modale").classList.add("actif");
+}
+function fermerFiche() { $("modale").classList.remove("actif"); fiche = null; }
+$("modale").onclick = e => { if (e.target.id === "modale" && !$("codeAcces")) fermerFiche(); };
+
+function rendreFiche() {
+  const l = fiche.ligne, a = l._art;
+  let h = `<div class="contenu"><div class="fiche-titre"><h2>${esc(l.nom)}</h2><span class="prix">${euros(l.prixBase)}</span></div>`;
+  groupesDe(l._cat, a).forEach(g => {
+    h += `<div class="section"><h3>${esc(g.titre)}${g.type === "multiple" ? " (payant)" : ""}</h3><div class="puces">` +
+      g.valeurs.map(v => `<button class="puce ${(l.choix[g.cle] || []).includes(v.nom) ? "on" : ""}" data-g="${g.cle}" data-v="${esc(v.nom)}">${
+        g.type === "multiple" ? "+ " : ""}${esc(v.nom)}${v.prix ? " · " + v.prix + "€" : ""}</button>`).join("") + `</div></div>`;
+  });
+  if ((a.ingredients || []).length) {
+    h += `<div class="section"><h3>Retirer un ingrédient</h3><div class="puces">` +
+      a.ingredients.map(i => `<button class="puce retire ${l.retraits.includes(i) ? "on" : ""}" data-r="${esc(i)}">${
+        l.retraits.includes(i) ? "Sans " : ""}${esc(i)}</button>`).join("") + `</div></div>`;
+  }
+  h += `<div class="section"><h3>Commentaire / ajout</h3>
+    <textarea id="ficheNote" rows="2" placeholder="ex : sauce à part, + oignons, allergie noix…">${esc(l.note)}</textarea>
+    <div class="raccourcis">${RACCOURCIS.map(r => `<button data-k="${esc(r)}">${esc(r)}</button>`).join("")}</div></div></div>`;
+  h += `<div class="pied">
+    ${fiche.index !== null ? `<button class="gros danger" id="fSuppr">🗑</button>` : ""}
+    <div class="qte"><button data-fq="-1">−</button><span>${l.quantite}</span><button data-fq="1">+</button></div>
+    <button class="gros principal" id="fValider">${fiche.index !== null ? "Enregistrer" : "Ajouter"} · ${euros(prixUnitaire(l) * l.quantite)}</button></div>`;
+  const scroll = $("boite").querySelector(".contenu") ? $("boite").querySelector(".contenu").scrollTop : 0;
+  $("boite").innerHTML = h;
+  $("boite").querySelector(".contenu").scrollTop = scroll;
+}
+
+$("boite").onclick = e => {
+  if (!fiche) return;
+  const l = fiche.ligne, d = e.target.dataset;
+  if ($("ficheNote")) l.note = $("ficheNote").value.trim();
+  if (d.g) {
+    const g = menu.groupes[d.g], sel = l.choix[d.g] || (l.choix[d.g] = []);
+    if (g.type === "unique") l.choix[d.g] = [d.v];
+    else { const i = sel.indexOf(d.v); i >= 0 ? sel.splice(i, 1) : sel.push(d.v); }
+    rendreFiche();
+  } else if (d.r) {
+    const i = l.retraits.indexOf(d.r); i >= 0 ? l.retraits.splice(i, 1) : l.retraits.push(d.r);
+    rendreFiche();
+  } else if (d.k) {
+    l.note = l.note ? l.note + ", " + d.k : d.k; rendreFiche();
+  } else if (d.fq) {
+    l.quantite = Math.max(1, l.quantite + +d.fq); rendreFiche();
+  } else if (e.target.id === "fValider") {
+    if (fiche.index === null) ajouterLigne(l);
+    else { panier[fiche.index] = l; rendrePanier(); rendreBarre(); }
+    fermerFiche();
+  } else if (e.target.id === "fSuppr") {
+    panier.splice(fiche.index, 1); fermerFiche(); rendrePanier(); rendreBarre();
+  }
+};
+
+/* ---------- Récapitulatif ---------- */
+function rendrePanier() {
+  $("couverts").textContent = couverts;
+  if (!panier.length) { $("lignesPanier").innerHTML = `<div class="vide">Aucun article</div>`; return; }
+  $("lignesPanier").innerHTML = panier.map((l, i) => {
+    const r = resumer(l), perso = personnalisable(l._cat, l._art);
+    return `<div class="ligne">
+      <div class="haut">
+        <span class="nom">${esc(l.nom)}<br><span class="prix">${euros(prixUnitaire(l) * l.quantite)}</span></span>
+        <div class="qte"><button data-q="-1" data-i="${i}">−</button><span>${l.quantite}</span><button data-q="1" data-i="${i}">+</button></div>
+      </div>
+      ${r.options.length ? `<div class="det opt">${esc(r.options.join(" · "))}</div>` : ""}
+      ${r.extras.map(x => `<div class="det ext">+ ${esc(x)}</div>`).join("")}
+      ${l.retraits.map(x => `<div class="det ret">SANS ${esc(x)}</div>`).join("")}
+      ${l.note ? `<div class="det com">« ${esc(l.note)} »</div>` : ""}
+      <button class="lien" data-m="${i}">${perso ? "Modifier (extras, retirer, commentaire)" : "Ajouter un commentaire"}</button>
+    </div>`;
+  }).join("") + `<div class="total"><span>Total</span><span>${euros(total())}</span></div>`;
+}
+$("lignesPanier").onclick = e => {
+  const d = e.target.dataset;
+  if (d.q) {
+    const l = panier[+d.i]; l.quantite += +d.q;
+    if (l.quantite <= 0) panier.splice(+d.i, 1);
+    rendrePanier(); rendreBarre();
+  } else if (d.m !== undefined) {
+    const l = panier[+d.m]; ouvrirFiche(l._cat, l._art, +d.m);
+  }
+};
+$("zoneCouverts").onclick = e => {
+  if (e.target.dataset.c) { couverts = Math.max(0, couverts + +e.target.dataset.c); $("couverts").textContent = couverts; }
+};
+
+async function envoyer() {
+  if (envoi || !panier.length) return;
+  envoi = true; rendreBarre();
+  const articles = panier.map(l => {
+    const r = resumer(l);
+    return { nom: l.nom, categorie: l.categorie, imprimante: l.imprimante, quantite: l.quantite,
+             prix: prixUnitaire(l), options: r.options, extras: r.extras.map(x => x.replace(/ \(\+.*\)$/, "")),
+             retraits: l.retraits, note: l.note };
+  });
+  try {
+    const res = await api("/api/commande", { table, serveur: $("serveur").value.trim(), couverts: couverts || null,
+                                             note: $("noteGlobale").value.trim(), articles });
+    const ko = res.impression.filter(x => !x.ok), alertes = res.impression.filter(x => x.alerte);
+    const imprimees = res.impression.filter(x => x.ok).map(x => x.imprimante + (x.test ? " (test)" : "") + " ✓").join("  ");
+    if (ko.length) toast("⚠ Commande n°" + res.numero + " enregistrée MAIS non imprimée : " + ko.map(x => x.erreur).join(", ") + ". Réimprimez depuis « Envoyées ».", false);
+    else if (alertes.length) toast("Imprimée (n°" + res.numero + ") mais : " + alertes.map(x => x.alerte).join(", "), false, "attention");
+    else toast("✓ Table " + table + " · n°" + res.numero + " — " + imprimees, true);
+    reinitialiser(); envoi = false; afficher("ecranTables"); verifierEtat();
+  } catch (err) {
+    envoi = false; rendreBarre();
+    if (err instanceof CodeRequis) return;
+    etat.wifi = false; rendreEtat();
+    toast("Échec de l'envoi : vérifiez le Wi-Fi. La commande n'est PAS partie, réessayez. (" + err.message + ")", false);
+  }
+}
+
+/* ---------- Historique ---------- */
+async function chargerHistorique() {
+  $("listeHistorique").innerHTML = `<div class="vide">Chargement…</div>`;
+  try {
+    const cmds = await api("/api/commandes");
+    $("listeHistorique").innerHTML = cmds.length ? cmds.map(c => `
+      <div class="ligne hist">
+        <div><b>Table ${esc(c.table)}</b> · n°${c.numero}<br>
+          <small>${c.date.slice(11, 16)} · ${esc(c.serveur || "-")} · ${c.articles.reduce((s, a) => s + a.quantite, 0)} art.</small><br>
+          <small>${c.articles.map(a => a.quantite + "× " + esc(a.nom)).join(", ")}</small><br>
+          <small>${(c.impression || []).map(x => `<span class="${x.ok ? "imp-ok" : "imp-ko"}">${esc(x.imprimante)} ${x.ok ? "✓ imprimé" : "✗ non imprimé"}</span>`).join(" · ")}</small></div>
+        <button data-r="${c.numero}">Réimprimer</button>
+      </div>`).join("") : `<div class="vide">Aucune commande aujourd'hui</div>`;
+  } catch (e) { $("listeHistorique").innerHTML = `<div class="vide">Impossible de charger</div>`; }
+}
+$("listeHistorique").onclick = async e => {
+  const n = e.target.dataset.r; if (!n || !confirm("Réimprimer la commande n°" + n + " ?")) return;
+  try {
+    const res = await api("/api/reimprimer", { numero: +n });
+    const ko = (res.impression || []).filter(x => !x.ok);
+    toast(ko.length ? ko.map(x => x.erreur).join(", ") : "✓ Réimprimée", !ko.length);
+  } catch (err) { if (!(err instanceof CodeRequis)) toast("Échec : vérifiez le Wi-Fi", false); }
+};
+
+async function demarrer() {
+  const m = await api("/api/menu");
+  menu = m; menu.groupes = menu.groupes || {};
+  rendreTables(); afficher("ecranTables"); verifierEtat();
+}
+demarrer().catch(e => {
+  if (e instanceof CodeRequis) return;
+  etat.wifi = false; rendreEtat();
+  toast("Erreur au démarrage : " + e.message, false);
+});
+</script>
+</body>
+</html>
